@@ -1,0 +1,14 @@
+version: '3.8'        # Compose 파일 버전
+
+services:             # 띄울 컨테이너들 정의
+  mysql:              # 컨테이너 이름 (마음대로 지어도 됨)
+    image: mysql:8.0  # 어떤 이미지 쓸지
+    container_name: board-mysql
+    ports:
+      - "3306:3306"   # 내컴퓨터포트:컨테이너포트
+    environment:      # 환경변수
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+
+volumes:              # 데이터 저장소 (컨테이너 꺼져도 데이터 유지)
+  mysql-data:
