@@ -16,6 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
@@ -74,6 +75,19 @@ public class PostServiceTest {
         assertThat(response.getTitle()).isEqualTo("테스트 제목");
         assertThat(response.getContent()).isEqualTo("테스트 내용");
         assertThat(response.getNickname()).isEqualTo("테스터");
+    }
+
+    @Test
+    @DisplayName("게시글 작성 실패 - 유저 없음")
+    void createFailUserNotFound() {
+        // given
+        PostCreateRequest request = new PostCreateRequest("테스트 제목", "테스트 내용");
+        given(userRepository.findById(1L)).willReturn(Optional.empty());
+
+        // when & then
+        assertThatThrownBy(() -> postService.create(request, 1L))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("유저를 찾을 수 없습니다");
     }
 
 }
