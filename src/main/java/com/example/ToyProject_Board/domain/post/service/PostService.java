@@ -2,11 +2,14 @@ package com.example.ToyProject_Board.domain.post.service;
 
 import com.example.ToyProject_Board.domain.post.Post;
 import com.example.ToyProject_Board.domain.post.dto.request.PostCreateRequest;
+import com.example.ToyProject_Board.domain.post.dto.response.PostListResponse;
 import com.example.ToyProject_Board.domain.post.dto.response.PostResponse;
 import com.example.ToyProject_Board.domain.post.repository.PostRepository;
 import com.example.ToyProject_Board.domain.user.User;
 import com.example.ToyProject_Board.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +36,11 @@ public class PostService {
                 .build();
 
         return new PostResponse(postRepository.save(post));
+    }
+
+    public Page<PostListResponse> getList(Pageable pageable) {
+        return postRepository.findAll(pageable)
+                .map(PostListResponse::new);
     }
 
 }
