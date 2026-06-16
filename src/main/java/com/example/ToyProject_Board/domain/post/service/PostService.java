@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestAttribute;
@@ -67,4 +68,15 @@ public class PostService {
         return new PostResponse(post);
     }
 
+    @Transactional
+    public void delete(Long postId, Long userId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다"));
+
+        if (!post.getUser().getId().equals(userId)) {
+            throw new RuntimeException("게시글 삭제 권한이 없습니다");
+        }
+
+        postRepository.delete(post);
+    }
 }
