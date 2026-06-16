@@ -2,6 +2,7 @@ package com.example.ToyProject_Board.domain.post.service;
 
 import com.example.ToyProject_Board.domain.post.Post;
 import com.example.ToyProject_Board.domain.post.dto.request.PostCreateRequest;
+import com.example.ToyProject_Board.domain.post.dto.request.PostUpdateRequest;
 import com.example.ToyProject_Board.domain.post.dto.response.PostListResponse;
 import com.example.ToyProject_Board.domain.post.dto.response.PostResponse;
 import com.example.ToyProject_Board.domain.post.repository.PostRepository;
@@ -49,6 +50,20 @@ public class PostService {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다"));
 
+        return new PostResponse(post);
+    }
+
+    // 게시글 수정
+    @Transactional
+    public PostResponse update(Long postId, PostUpdateRequest request, Long userId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다"));
+
+        if (!post.getUser().getId().equals(userId)) {
+            throw new RuntimeException("게시글 수정 권한이 없습니다");
+        }
+
+        post.update(request.getTitle(), request.getContent());
         return new PostResponse(post);
     }
 

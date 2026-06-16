@@ -1,6 +1,7 @@
 package com.example.ToyProject_Board.domain.post.controller;
 
 import com.example.ToyProject_Board.domain.post.dto.request.PostCreateRequest;
+import com.example.ToyProject_Board.domain.post.dto.request.PostUpdateRequest;
 import com.example.ToyProject_Board.domain.post.dto.response.PostListResponse;
 import com.example.ToyProject_Board.domain.post.dto.response.PostResponse;
 import com.example.ToyProject_Board.domain.post.service.PostService;
@@ -38,5 +39,13 @@ public class PostController {
     @GetMapping("/{id}")
     public ResponseEntity<PostResponse> getOne(@PathVariable Long id) {
         return ResponseEntity.ok(postService.getOne(id));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<PostResponse> update(
+            @PathVariable Long id,
+            @Valid @RequestBody PostUpdateRequest request,
+            @RequestAttribute("userId") Long userId) {
+        return ResponseEntity.ok(postService.update(id, request, userId));
     }
 }
