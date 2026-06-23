@@ -1,11 +1,13 @@
 package com.example.ToyProject_Board.domain.post.dto.response;
 
 import com.example.ToyProject_Board.domain.post.Post;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
 
 @Getter
+@AllArgsConstructor
 public class PostListResponse {
 
     private Long id;

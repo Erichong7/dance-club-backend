@@ -31,6 +31,10 @@ public class User {
 
     private String refreshToken;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private UserRole role = UserRole.USER;
+
     @CreatedDate
     private LocalDateTime createdAt;
 
@@ -43,5 +47,9 @@ public class User {
 
     public void updateRefreshToken(String refreshToken) {
         this.refreshToken = refreshToken;
+    }
+
+    public void updateRole(UserRole role) {
+        this.role = role;
     }
 }
