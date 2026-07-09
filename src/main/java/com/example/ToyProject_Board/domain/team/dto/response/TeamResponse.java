@@ -1,15 +1,22 @@
 package com.example.ToyProject_Board.domain.team.dto.response;
 
 import com.example.ToyProject_Board.domain.team.Team;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
 
 @Getter
+@Schema(description = "팀 응답")
 public class TeamResponse {
 
+    @Schema(description = "팀 ID", example = "1")
     private final Long id;
+
+    @Schema(description = "팀 이름", example = "스트릿댄스팀")
     private final String name;
+
+    @Schema(description = "팀 생성일시", example = "2026-03-01T10:00:00")
     private final LocalDateTime createdAt;
 
     public TeamResponse(Team team) {
