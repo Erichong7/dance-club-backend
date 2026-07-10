@@ -1,5 +1,6 @@
 package com.example.ToyProject_Board.domain.schedule.dto.request;
 
+import com.example.ToyProject_Board.domain.schedule.RoomType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -32,4 +33,8 @@ public class ScheduleCreateRequest {
     @Schema(description = "연습 종료 시간", example = "20:00:00")
     @NotNull
     private LocalTime endTime;
+
+    @Schema(description = "후보 연습실", example = "UNDERGROUND_PARKING")
+    @NotNull
+    private RoomType alternativeRoom;
 }

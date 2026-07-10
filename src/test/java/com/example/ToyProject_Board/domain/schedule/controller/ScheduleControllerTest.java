@@ -60,7 +60,8 @@ class ScheduleControllerTest extends ControllerTestSupport {
                                 "teamId", 10,
                                 "practiceDate", futureDate.toString(),
                                 "startTime", "18:00:00",
-                                "endTime", "20:00:00"
+                                "endTime", "20:00:00",
+                                "alternativeRoom", "UNDERGROUND_PARKING"
                         )))
                         .requestAttr("userId", 1L))
                 .andExpect(status().isOk())

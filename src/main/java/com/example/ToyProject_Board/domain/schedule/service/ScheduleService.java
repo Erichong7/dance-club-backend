@@ -78,6 +78,7 @@ public class ScheduleService {
                 .practiceDate(practiceDate)
                 .startTime(startTime)
                 .endTime(endTime)
+                .alternativeRoom(request.getAlternativeRoom())
                 .build();
         return new ScheduleResponse(scheduleRequestRepository.save(scheduleRequest));
     }
@@ -197,9 +198,9 @@ public class ScheduleService {
                 }
             }
 
-            // 4. 지하 주차장 (기본 폴백)
+            // 4. 예비 연습실 배정
             if (!assigned) {
-                request.approve(RoomType.UNDERGROUND_PARKING);
+                request.approve(request.getAlternativeRoom());
             }
         }
 

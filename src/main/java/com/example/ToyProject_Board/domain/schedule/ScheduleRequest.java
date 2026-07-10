@@ -48,6 +48,10 @@ public class ScheduleRequest {
     private LocalTime endTime;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private RoomType alternativeRoom;
+
+    @Enumerated(EnumType.STRING)
     private RoomType assignedRoom;
 
     @Enumerated(EnumType.STRING)
@@ -64,7 +68,7 @@ public class ScheduleRequest {
 
     @Builder
     public ScheduleRequest(Performance performance, Team team, User submittedBy,
-                           LocalDate practiceDate, LocalTime startTime, LocalTime endTime) {
+                           LocalDate practiceDate, LocalTime startTime, LocalTime endTime, RoomType alternativeRoom) {
         this.performance = performance;
         this.team = team;
         this.submittedBy = submittedBy;
@@ -72,6 +76,7 @@ public class ScheduleRequest {
         this.startTime = startTime;
         this.endTime = endTime;
         this.status = ScheduleStatus.PENDING;
+        this.alternativeRoom = alternativeRoom;
     }
 
     public void approve(RoomType assignedRoom) {
