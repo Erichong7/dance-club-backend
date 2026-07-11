@@ -6,6 +6,7 @@ import com.example.ToyProject_Board.domain.schedule.RoomType;
 import com.example.ToyProject_Board.domain.schedule.ScheduleRequest;
 import com.example.ToyProject_Board.domain.schedule.ScheduleStatus;
 import com.example.ToyProject_Board.domain.schedule.dto.request.AssignRoomRequest;
+import com.example.ToyProject_Board.domain.schedule.dto.request.ScheduleAssignRequest;
 import com.example.ToyProject_Board.domain.schedule.dto.request.ScheduleCreateRequest;
 import com.example.ToyProject_Board.domain.schedule.dto.request.ScheduleRejectRequest;
 import com.example.ToyProject_Board.domain.schedule.dto.response.ScheduleResponse;
@@ -129,6 +130,32 @@ public class ScheduleService {
         }
         request.reject(rejectRequest.getAdminNote());
         return new ScheduleResponse(request);
+    }
+
+    @Transactional
+    public ScheduleResponse assignRoom(ScheduleAssignRequest request, Long adminUserId) {
+        verifyAdmin(adminUserId);
+        Performance performance = findPerformanceById(request.getPerformanceId());
+        Team team = findTeamById(request.getTeamId());
+        List<TeamMember> teamMembers = teamMemberRepository.findByTeam(team);
+        User leader = teamMembers.stream()
+                .filter(teamMember -> teamMember.getRole() == TeamMemberRole.LEADER)
+                .findFirst()
+                .map(TeamMember::getUser)
+                .orElseThrow(() -> new RuntimeException("팀에 리더가 존재하지 않습니다."));
+
+        ScheduleRequest scheduleRequest = ScheduleRequest.builder()
+                .performance(performance)
+                .team(team)
+                .submittedBy(leader)
+                .practiceDate(request.getPracticeDate())
+                .startTime(request.getStartTime())
+                .endTime(request.getEndTime())
+                .alternativeRoom(request.getRoom())
+                .build();
+        scheduleRequest.approve(request.getRoom());
+
+        return new ScheduleResponse(scheduleRequestRepository.save(scheduleRequest));
     }
 
     @Transactional

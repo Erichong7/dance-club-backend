@@ -1,6 +1,7 @@
 package com.example.ToyProject_Board.domain.schedule.controller;
 
 import com.example.ToyProject_Board.domain.schedule.dto.request.AssignRoomRequest;
+import com.example.ToyProject_Board.domain.schedule.dto.request.ScheduleAssignRequest;
 import com.example.ToyProject_Board.domain.schedule.dto.request.ScheduleCreateRequest;
 import com.example.ToyProject_Board.domain.schedule.dto.request.ScheduleRejectRequest;
 import com.example.ToyProject_Board.domain.schedule.dto.response.ScheduleResponse;
@@ -103,6 +104,18 @@ public class ScheduleController {
             @Valid @RequestBody AssignRoomRequest request,
             @RequestAttribute("userId") Long userId) {
         return ResponseEntity.ok(scheduleService.reassignRoom(id, request, userId));
+    }
+
+    @Operation(summary = "연습실 수동 배정", description = "관리자가 팀의 연습 일정을 직접 등록하면서 연습실을 지정해 바로 승인합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "연습실 수동 배정 성공"),
+            @ApiResponse(responseCode = "400", description = "요청값 검증 실패 (공연/팀/날짜/시간/연습실 누락)")
+    })
+    @PostMapping("/assign/manual")
+    public ResponseEntity<ScheduleResponse> assignRoom(
+            @Valid @RequestBody ScheduleAssignRequest request,
+            @RequestAttribute("userId") Long userId) {
+        return ResponseEntity.ok(scheduleService.assignRoom(request, userId));
     }
 
     @Operation(summary = "주간 연습실 일괄 배정", description = "특정 공연의 해당 주(weekStart 기준)에 PENDING 상태인 연습 일정들에 연습실을 일괄 자동 배정합니다.")
