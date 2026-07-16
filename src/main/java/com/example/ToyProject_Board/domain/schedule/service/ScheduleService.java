@@ -234,6 +234,23 @@ public class ScheduleService {
         return requests.stream().map(ScheduleResponse::new).toList();
     }
 
+    @Transactional
+    public void delete(Long scheduleId, Long userId) {
+        User user = findUserById(userId);
+        ScheduleRequest scheduleRequest = findScheduleById(scheduleId);
+
+        boolean isAdmin = user.getRole() == UserRole.ADMIN;
+        boolean isTeamLeader = teamMemberRepository.findByTeamAndUser(scheduleRequest.getTeam(), user)
+                .map(teamMember -> teamMember.getRole() == TeamMemberRole.LEADER)
+                .orElse(false);
+
+        if (!isAdmin && !isTeamLeader) {
+            throw new RuntimeException("삭제 권한이 없습니다");
+        }
+
+        scheduleRequestRepository.delete(scheduleRequest);
+    }
+
     private void validateDeadline(LocalDate practiceDate) {
         LocalDate weekStart = practiceDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
         LocalDate deadline = weekStart.minusDays(1); // 전주 일요일

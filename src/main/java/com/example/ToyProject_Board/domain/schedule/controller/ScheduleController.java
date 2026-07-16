@@ -128,4 +128,14 @@ public class ScheduleController {
             @RequestAttribute("userId") Long userId) {
         return ResponseEntity.ok(scheduleService.assignWeek(performanceId, weekStart, userId));
     }
+
+    @Operation(summary = "연습 일정 삭제", description = "관리자나 해당 스케줄의 팀장은 연습 일정을 삭제할 수 있습니다.")
+    @ApiResponse(responseCode = "204", description = "연습 일정 삭제 성공")
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(
+            @Parameter(description = "삭제할 연습 일정 ID", example = "1") @PathVariable Long id,
+            @RequestAttribute("userId") Long userId) {
+        scheduleService.delete(id, userId);
+        return ResponseEntity.noContent().build();
+    }
 }
