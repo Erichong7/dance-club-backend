@@ -70,7 +70,7 @@ public class ScheduleService {
         LocalTime endTime = request.getEndTime();
 
         validateDeadline(practiceDate);
-        validateDailyLimit(team, practiceDate, startTime, endTime);
+//        validateDailyLimit(team, practiceDate, startTime, endTime);
 
         ScheduleRequest scheduleRequest = ScheduleRequest.builder()
                 .performance(performance)
@@ -259,18 +259,18 @@ public class ScheduleService {
         }
     }
 
-    private void validateDailyLimit(Team team, LocalDate date, LocalTime startTime, LocalTime endTime) {
-        List<ScheduleRequest> existing = scheduleRequestRepository.findByTeamAndPracticeDate(team, date);
-        long bookedMinutes = existing.stream()
-                .filter(r -> r.getStatus() != ScheduleStatus.CANCELLED
-                        && r.getStatus() != ScheduleStatus.REJECTED)
-                .mapToLong(r -> ChronoUnit.MINUTES.between(r.getStartTime(), r.getEndTime()))
-                .sum();
-        long newMinutes = ChronoUnit.MINUTES.between(startTime, endTime);
-        if (bookedMinutes + newMinutes > MAX_DAILY_MINUTES) {
-            throw new RuntimeException("팀별 하루 최대 2시간을 초과합니다");
-        }
-    }
+//    private void validateDailyLimit(Team team, LocalDate date, LocalTime startTime, LocalTime endTime) {
+//        List<ScheduleRequest> existing = scheduleRequestRepository.findByTeamAndPracticeDate(team, date);
+//        long bookedMinutes = existing.stream()
+//                .filter(r -> r.getStatus() != ScheduleStatus.CANCELLED
+//                        && r.getStatus() != ScheduleStatus.REJECTED)
+//                .mapToLong(r -> ChronoUnit.MINUTES.between(r.getStartTime(), r.getEndTime()))
+//                .sum();
+//        long newMinutes = ChronoUnit.MINUTES.between(startTime, endTime);
+//        if (bookedMinutes + newMinutes > MAX_DAILY_MINUTES) {
+//            throw new RuntimeException("팀별 하루 최대 2시간을 초과합니다");
+//        }
+//    }
 
     // toMinutes: [startMinuteOfDay, endMinuteOfDay]
     private long[] toMinutes(LocalTime start, LocalTime end) {

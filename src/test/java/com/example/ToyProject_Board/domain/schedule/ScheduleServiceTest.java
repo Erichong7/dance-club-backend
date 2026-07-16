@@ -150,41 +150,41 @@ class ScheduleServiceTest {
                 .hasMessageContaining("제출 기한");
     }
 
-    @Test
-    void 하루_최대_연습시간_초과로_일정_생성_실패() {
-        User user = UserFixture.createWithId(1L);
-        Team team = TeamFixture.createWithId(10L);
-        Performance performance = PerformanceFixture.createWithId(5L);
-
-        TeamMember leader = TeamMember.builder()
-                .team(team).user(user).role(TeamMemberRole.LEADER).build();
-
-        // 이미 2시간 신청된 상태
-        ScheduleRequest existing = ScheduleRequest.builder()
-                .performance(performance).team(team).submittedBy(user)
-                .practiceDate(futurePracticeDate())
-                .startTime(LocalTime.of(16, 0))
-                .endTime(LocalTime.of(18, 0))
-                .build();
-
-        given(userRepository.findById(1L)).willReturn(Optional.of(user));
-        given(performanceRepository.findById(5L)).willReturn(Optional.of(performance));
-        given(teamRepository.findById(10L)).willReturn(Optional.of(team));
-        given(teamMemberRepository.findByTeamAndUser(team, user)).willReturn(Optional.of(leader));
-        given(scheduleRequestRepository.findByTeamAndPracticeDate(team, futurePracticeDate()))
-                .willReturn(List.of(existing));
-
-        ScheduleCreateRequest request = new ScheduleCreateRequest();
-        ReflectionTestUtils.setField(request, "performanceId", 5L);
-        ReflectionTestUtils.setField(request, "teamId", 10L);
-        ReflectionTestUtils.setField(request, "practiceDate", futurePracticeDate());
-        ReflectionTestUtils.setField(request, "startTime", LocalTime.of(18, 0));
-        ReflectionTestUtils.setField(request, "endTime", LocalTime.of(19, 0));
-
-        assertThatThrownBy(() -> scheduleService.create(request, 1L))
-                .isInstanceOf(RuntimeException.class)
-                .hasMessageContaining("하루 최대 2시간");
-    }
+//    @Test
+//    void 하루_최대_연습시간_초과로_일정_생성_실패() {
+//        User user = UserFixture.createWithId(1L);
+//        Team team = TeamFixture.createWithId(10L);
+//        Performance performance = PerformanceFixture.createWithId(5L);
+//
+//        TeamMember leader = TeamMember.builder()
+//                .team(team).user(user).role(TeamMemberRole.LEADER).build();
+//
+//        // 이미 2시간 신청된 상태
+//        ScheduleRequest existing = ScheduleRequest.builder()
+//                .performance(performance).team(team).submittedBy(user)
+//                .practiceDate(futurePracticeDate())
+//                .startTime(LocalTime.of(16, 0))
+//                .endTime(LocalTime.of(18, 0))
+//                .build();
+//
+//        given(userRepository.findById(1L)).willReturn(Optional.of(user));
+//        given(performanceRepository.findById(5L)).willReturn(Optional.of(performance));
+//        given(teamRepository.findById(10L)).willReturn(Optional.of(team));
+//        given(teamMemberRepository.findByTeamAndUser(team, user)).willReturn(Optional.of(leader));
+//        given(scheduleRequestRepository.findByTeamAndPracticeDate(team, futurePracticeDate()))
+//                .willReturn(List.of(existing));
+//
+//        ScheduleCreateRequest request = new ScheduleCreateRequest();
+//        ReflectionTestUtils.setField(request, "performanceId", 5L);
+//        ReflectionTestUtils.setField(request, "teamId", 10L);
+//        ReflectionTestUtils.setField(request, "practiceDate", futurePracticeDate());
+//        ReflectionTestUtils.setField(request, "startTime", LocalTime.of(18, 0));
+//        ReflectionTestUtils.setField(request, "endTime", LocalTime.of(19, 0));
+//
+//        assertThatThrownBy(() -> scheduleService.create(request, 1L))
+//                .isInstanceOf(RuntimeException.class)
+//                .hasMessageContaining("하루 최대 2시간");
+//    }
 
     @Test
     void 주간_연습실_배정_성공() {
