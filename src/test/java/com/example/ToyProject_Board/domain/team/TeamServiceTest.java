@@ -40,7 +40,7 @@ class TeamServiceTest {
     private UserRepository userRepository;
 
     @Test
-    void createTeamSuccess() {
+    void 팀_생성_성공() {
         User admin = UserFixture.createAdminWithId(1L);
         given(userRepository.findById(1L)).willReturn(Optional.of(admin));
         given(teamRepository.existsByName("신규팀")).willReturn(false);
@@ -57,7 +57,7 @@ class TeamServiceTest {
     }
 
     @Test
-    void createTeamFail_notAdmin() {
+    void 관리자가_아닌_사용자의_팀_생성_실패() {
         User user = UserFixture.createWithId(1L);
         given(userRepository.findById(1L)).willReturn(Optional.of(user));
 
@@ -70,7 +70,7 @@ class TeamServiceTest {
     }
 
     @Test
-    void createTeamFail_duplicateName() {
+    void 중복된_이름으로_팀_생성_실패() {
         User admin = UserFixture.createAdminWithId(1L);
         given(userRepository.findById(1L)).willReturn(Optional.of(admin));
         given(teamRepository.existsByName("중복팀")).willReturn(true);
@@ -84,7 +84,7 @@ class TeamServiceTest {
     }
 
     @Test
-    void addMemberSuccess() {
+    void 팀원_추가_성공() {
         User admin = UserFixture.createAdminWithId(1L);
         User targetUser = UserFixture.createWithId(2L);
         Team team = TeamFixture.createWithId(10L);
@@ -110,7 +110,7 @@ class TeamServiceTest {
     }
 
     @Test
-    void addMemberFail_alreadyLeaderExists() {
+    void 팀장이_이미_존재하는_팀원_추가_실패() {
         User admin = UserFixture.createAdminWithId(1L);
         User targetUser = UserFixture.createWithId(2L);
         Team team = TeamFixture.createWithId(10L);
@@ -131,7 +131,7 @@ class TeamServiceTest {
     }
 
     @Test
-    void addMemberFail_alreadyMember() {
+    void 이미_소속된_팀원_추가_실패() {
         User admin = UserFixture.createAdminWithId(1L);
         User targetUser = UserFixture.createWithId(2L);
         Team team = TeamFixture.createWithId(10L);

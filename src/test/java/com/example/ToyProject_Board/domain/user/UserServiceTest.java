@@ -54,7 +54,7 @@ class UserServiceTest {
 
     @Test
     @DisplayName("회원가입 성공")
-    void signupSuccess() {
+    void 회원가입_성공() {
         // given
         SignupRequest request = signupRequest("test@test.com", "password123", "테스터");
         given(userRepository.existsByEmail("test@test.com")).willReturn(false);
@@ -67,7 +67,7 @@ class UserServiceTest {
 
     @Test
     @DisplayName("회원가입 실패 - 이메일 중복")
-    void signupFail_duplicateEmail() {
+    void 이메일_중복으로_회원가입_실패() {
         // given
         SignupRequest request = signupRequest("test@test.com", "password123", "테스터");
         given(userRepository.existsByEmail("test@test.com")).willReturn(true);
@@ -80,7 +80,7 @@ class UserServiceTest {
 
     @Test
     @DisplayName("로그인 성공")
-    void loginSuccess() {
+    void 로그인_성공() {
         // given
         LoginRequest request = loginRequest("test@test.com", "password123");
         User user = UserFixture.createWithId(1L);
@@ -100,7 +100,7 @@ class UserServiceTest {
 
     @Test
     @DisplayName("로그인 실패 - 이메일 없음")
-    void loginFail_emailNotFound() {
+    void 존재하지_않는_이메일로_로그인_실패() {
         // given
         LoginRequest request = loginRequest("notfound@test.com", "password123");
         given(userRepository.findByEmail("notfound@test.com")).willReturn(Optional.empty());
@@ -113,7 +113,7 @@ class UserServiceTest {
 
     @Test
     @DisplayName("로그인 실패 - 비밀번호 틀림")
-    void loginFail_wrongPassword() {
+    void 비밀번호_불일치로_로그인_실패() {
         // given
         LoginRequest request = loginRequest("test@test.com", "wrong_password");
         User user = UserFixture.createWithId(1L);
@@ -129,7 +129,7 @@ class UserServiceTest {
 
     @Test
     @DisplayName("토큰 재발급 성공")
-    void reissueSuccess() {
+    void 토큰_재발급_성공() {
         // given
         User user = UserFixture.createWithId(1L);
         user.updateRefreshToken("valid_refresh_token");
@@ -150,7 +150,7 @@ class UserServiceTest {
 
     @Test
     @DisplayName("토큰 재발급 실패 - 유효하지 않은 토큰")
-    void reissueFail_invalidToken() {
+    void 유효하지_않은_토큰으로_재발급_실패() {
         // given
         given(jwtUtil.validateToken("invalid_token")).willReturn(false);
 
@@ -162,7 +162,7 @@ class UserServiceTest {
 
     @Test
     @DisplayName("토큰 재발급 실패 - 저장된 토큰과 불일치")
-    void reissueFail_tokenMismatch() {
+    void 저장된_토큰과_불일치로_재발급_실패() {
         // given
         User user = UserFixture.createWithId(1L);
         user.updateRefreshToken("stored_token");
@@ -179,7 +179,7 @@ class UserServiceTest {
 
     @Test
     @DisplayName("로그아웃 성공")
-    void logoutSuccess() {
+    void 로그아웃_성공() {
         // given
         User user = UserFixture.createWithId(1L);
         user.updateRefreshToken("some_token");
@@ -191,7 +191,7 @@ class UserServiceTest {
 
     @Test
     @DisplayName("로그아웃 실패 - 유저 없음")
-    void logoutFail_userNotFound() {
+    void 존재하지_않는_유저의_로그아웃_실패() {
         // given
         given(userRepository.findById(99L)).willReturn(Optional.empty());
 

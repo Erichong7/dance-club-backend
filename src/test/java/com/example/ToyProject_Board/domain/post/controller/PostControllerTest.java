@@ -44,7 +44,7 @@ public class PostControllerTest extends ControllerTestSupport {
 
     @Test
     @DisplayName("게시글 작성 성공")
-    void createSuccess() throws Exception {
+    void 게시글_작성_성공() throws Exception {
         PostCreateRequest request = new PostCreateRequest("테스트 제목", "테스트 내용");
         PostResponse response = new PostResponse(1L, "테스트 제목", "테스트 내용", "테스터", null, null);
         given(postService.create(any(), any())).willReturn(response);
@@ -61,7 +61,7 @@ public class PostControllerTest extends ControllerTestSupport {
 
     @Test
     @DisplayName("게시글 작성 실패 - 빈 제목")
-    void createFail_emptyTitle() throws Exception {
+    void 빈_제목으로_게시글_작성_실패() throws Exception {
         PostCreateRequest request = new PostCreateRequest("", "테스트 내용");
 
         mockMvc.perform(post("/api/posts")
@@ -74,7 +74,7 @@ public class PostControllerTest extends ControllerTestSupport {
 
     @Test
     @DisplayName("게시글 작성 실패 - 빈 내용")
-    void createFail_emptyContent() throws Exception {
+    void 빈_내용으로_게시글_작성_실패() throws Exception {
         PostCreateRequest request = new PostCreateRequest("테스트 제목", "");
 
         mockMvc.perform(post("/api/posts")
@@ -87,7 +87,7 @@ public class PostControllerTest extends ControllerTestSupport {
 
     @Test
     @DisplayName("게시글 목록 조회 성공")
-    void getListSuccess() throws Exception {
+    void 게시글_목록_조회_성공() throws Exception {
         Page<PostListResponse> page = new PageImpl<>(List.of(
                 new PostListResponse(1L, "테스트 제목", "테스터", null)
         ));
@@ -102,7 +102,7 @@ public class PostControllerTest extends ControllerTestSupport {
 
     @Test
     @DisplayName("게시글 단건 조회 성공")
-    void getOneSuccess() throws Exception {
+    void 게시글_단건_조회_성공() throws Exception {
         PostResponse response = new PostResponse(1L, "테스트 제목", "테스트 내용", "테스터", null, null);
         given(postService.getOne(1L)).willReturn(response);
 
@@ -115,7 +115,7 @@ public class PostControllerTest extends ControllerTestSupport {
 
     @Test
     @DisplayName("게시글 수정 성공")
-    void updateSuccess() throws Exception {
+    void 게시글_수정_성공() throws Exception {
         PostUpdateRequest request = new PostUpdateRequest("수정된 제목", "수정된 내용");
         PostResponse response = new PostResponse(1L, "수정된 제목", "수정된 내용", "테스터", null, null);
         given(postService.update(eq(1L), any(), eq(1L))).willReturn(response);
@@ -132,7 +132,7 @@ public class PostControllerTest extends ControllerTestSupport {
 
     @Test
     @DisplayName("게시글 수정 실패 - 빈 제목")
-    void updateFail_emptyTitle() throws Exception {
+    void 빈_제목으로_게시글_수정_실패() throws Exception {
         PostUpdateRequest request = new PostUpdateRequest("", "수정된 내용");
 
         mockMvc.perform(put("/api/posts/1")
@@ -145,7 +145,7 @@ public class PostControllerTest extends ControllerTestSupport {
 
     @Test
     @DisplayName("게시글 삭제 성공")
-    void deleteSuccess() throws Exception {
+    void 게시글_삭제_성공() throws Exception {
         mockMvc.perform(delete("/api/posts/1")
                         .requestAttr("userId", 1L))
                 .andExpect(status().isNoContent())

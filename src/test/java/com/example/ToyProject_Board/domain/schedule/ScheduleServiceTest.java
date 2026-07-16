@@ -60,7 +60,7 @@ class ScheduleServiceTest {
     }
 
     @Test
-    void createSuccess() {
+    void 일정_생성_성공() {
         User user = UserFixture.createWithId(1L);
         Team team = TeamFixture.createWithId(10L);
         Performance performance = PerformanceFixture.createWithId(5L);
@@ -96,7 +96,7 @@ class ScheduleServiceTest {
     }
 
     @Test
-    void createFail_notLeaderOrDeputy() {
+    void 권한없는_팀원의_일정_생성_실패() {
         User user = UserFixture.createWithId(1L);
         Team team = TeamFixture.createWithId(10L);
         Performance performance = PerformanceFixture.createWithId(5L);
@@ -122,7 +122,7 @@ class ScheduleServiceTest {
     }
 
     @Test
-    void createFail_deadlinePassed() {
+    void 제출_기한_초과로_일정_생성_실패() {
         User user = UserFixture.createWithId(1L);
         Team team = TeamFixture.createWithId(10L);
         Performance performance = PerformanceFixture.createWithId(5L);
@@ -151,7 +151,7 @@ class ScheduleServiceTest {
     }
 
     @Test
-    void createFail_dailyLimitExceeded() {
+    void 하루_최대_연습시간_초과로_일정_생성_실패() {
         User user = UserFixture.createWithId(1L);
         Team team = TeamFixture.createWithId(10L);
         Performance performance = PerformanceFixture.createWithId(5L);
@@ -187,7 +187,7 @@ class ScheduleServiceTest {
     }
 
     @Test
-    void assignWeekSuccess() {
+    void 주간_연습실_배정_성공() {
         User admin = UserFixture.createAdminWithId(1L);
         Team teamA = TeamFixture.createWithNameAndId("A팀", 10L);
         Team teamB = TeamFixture.createWithNameAndId("B팀", 20L);
@@ -229,7 +229,7 @@ class ScheduleServiceTest {
     }
 
     @Test
-    void cancelSuccess_bySubmitter() {
+    void 신청자_본인의_일정_취소_성공() {
         User user = UserFixture.createWithId(1L);
         Team team = TeamFixture.createWithId(10L);
         Performance performance = PerformanceFixture.createWithId(5L);

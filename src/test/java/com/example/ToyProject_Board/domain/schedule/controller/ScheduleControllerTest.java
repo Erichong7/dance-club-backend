@@ -47,7 +47,7 @@ class ScheduleControllerTest extends ControllerTestSupport {
     private ScheduleService scheduleService;
 
     @Test
-    void createScheduleSuccess() throws Exception {
+    void 일정_생성_성공() throws Exception {
         ScheduleResponse response = buildScheduleResponse();
         given(scheduleService.create(any(), eq(1L))).willReturn(response);
 
@@ -69,7 +69,7 @@ class ScheduleControllerTest extends ControllerTestSupport {
     }
 
     @Test
-    void createScheduleFail_missingFields() throws Exception {
+    void 필수값_누락으로_일정_생성_실패() throws Exception {
         mockMvc.perform(post("/api/schedules")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(Map.of(
@@ -79,7 +79,7 @@ class ScheduleControllerTest extends ControllerTestSupport {
     }
 
     @Test
-    void getByWeekSuccess() throws Exception {
+    void 주간_일정_조회_성공() throws Exception {
         given(scheduleService.getByWeek(any(), any(), any()))
                 .willReturn(new PageImpl<>(List.of()));
 
@@ -90,7 +90,7 @@ class ScheduleControllerTest extends ControllerTestSupport {
     }
 
     @Test
-    void assignWeekSuccess() throws Exception {
+    void 주간_연습실_배정_성공() throws Exception {
         given(scheduleService.assignWeek(eq(5L), any(), eq(1L)))
                 .willReturn(List.of());
 
@@ -102,7 +102,7 @@ class ScheduleControllerTest extends ControllerTestSupport {
     }
 
     @Test
-    void cancelSuccess() throws Exception {
+    void 일정_취소_성공() throws Exception {
         mockMvc.perform(post("/api/schedules/100/cancel")
                         .requestAttr("userId", 1L))
                 .andExpect(status().isNoContent());

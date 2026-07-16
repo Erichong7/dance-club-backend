@@ -57,7 +57,7 @@ public class PostServiceTest {
 
     @Test
     @DisplayName("게시글 작성 성공")
-    void createSuccess() {
+    void 게시글_작성_성공() {
         // given
         User user = createUser();
         PostCreateRequest request = new PostCreateRequest("테스트 제목", "테스트 내용");
@@ -77,7 +77,7 @@ public class PostServiceTest {
 
     @Test
     @DisplayName("게시글 작성 실패 - 유저 없음")
-    void createFailUserNotFound() {
+    void 존재하지_않는_유저의_게시글_작성_실패() {
         // given
         PostCreateRequest request = new PostCreateRequest("테스트 제목", "테스트 내용");
         given(userRepository.findById(1L)).willReturn(Optional.empty());
@@ -90,7 +90,7 @@ public class PostServiceTest {
 
     @Test
     @DisplayName("게시글 목록 조회 성공")
-    void getListSuccess() {
+    void 게시글_목록_조회_성공() {
         // given
         User user = createUser();
         Post post1 = createPost(user);
@@ -110,7 +110,7 @@ public class PostServiceTest {
 
     @Test
     @DisplayName("게시글 단건 조회 성공")
-    void getPostSuccess() {
+    void 게시글_단건_조회_성공() {
         // given
         User user = createUser();
         Post post = createPost(user);
@@ -128,7 +128,7 @@ public class PostServiceTest {
 
     @Test
     @DisplayName("게시글 단건 조회 실패 - 게시글 없음")
-    void getOneFailNotFound() {
+    void 존재하지_않는_게시글_조회_실패() {
         // given
         given(postRepository.findById(1L)).willReturn(Optional.empty());
 
@@ -140,7 +140,7 @@ public class PostServiceTest {
 
     @Test
     @DisplayName("게시글 수정 성공")
-    void updateSuccess() {
+    void 게시글_수정_성공() {
         // given
         User user = createUser();
         ReflectionTestUtils.setField(user, "id", 1L);
@@ -158,7 +158,7 @@ public class PostServiceTest {
 
     @Test
     @DisplayName("게시글 수정 실패 - 권한 없음")
-    void updateFailUnauthorized() {
+    void 권한없는_사용자의_게시글_수정_실패() {
         // given
         User user = createUser();
         ReflectionTestUtils.setField(user, "id", 1L);
@@ -174,7 +174,7 @@ public class PostServiceTest {
 
     @Test
     @DisplayName("게시글 수정 실패 - 게시글 없음")
-    void updateFailNotFound() {
+    void 존재하지_않는_게시글_수정_실패() {
         // given
         given(postRepository.findById(1L)).willReturn(Optional.empty());
 
@@ -186,7 +186,7 @@ public class PostServiceTest {
 
     @Test
     @DisplayName("게시글 삭제 성공")
-    void deleteSuccess() {
+    void 게시글_삭제_성공() {
         // given
         User user = createUser();
         ReflectionTestUtils.setField(user, "id", 1L);
@@ -203,7 +203,7 @@ public class PostServiceTest {
 
     @Test
     @DisplayName("게시글 삭제 실패 - 권한 없음")
-    void deleteFailUnauthorized() {
+    void 권한없는_사용자의_게시글_삭제_실패() {
         // given
         User user = createUser();
         ReflectionTestUtils.setField(user, "id", 1L);
@@ -220,7 +220,7 @@ public class PostServiceTest {
 
     @Test
     @DisplayName("게시글 삭제 실패 - 게시글 없음")
-    void deleteFailNotFound() {
+    void 존재하지_않는_게시글_삭제_실패() {
         // given
         given(postRepository.findById(1L)).willReturn(Optional.empty());
 

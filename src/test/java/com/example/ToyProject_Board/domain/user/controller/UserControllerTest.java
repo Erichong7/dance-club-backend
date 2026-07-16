@@ -32,7 +32,7 @@ public class UserControllerTest extends ControllerTestSupport {
 
     @Test
     @DisplayName("회원가입 성공")
-    void signupSuccess() throws Exception {
+    void 회원가입_성공() throws Exception {
         mockMvc.perform(post("/api/auth/signup")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
@@ -48,7 +48,7 @@ public class UserControllerTest extends ControllerTestSupport {
 
     @Test
     @DisplayName("회원가입 실패 - 이메일 형식 오류")
-    void signupFail_invalidEmail() throws Exception {
+    void 이메일_형식_오류로_회원가입_실패() throws Exception {
         mockMvc.perform(post("/api/auth/signup")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
@@ -64,7 +64,7 @@ public class UserControllerTest extends ControllerTestSupport {
 
     @Test
     @DisplayName("회원가입 실패 - 비밀번호 최소 길이 미달")
-    void signupFail_shortPassword() throws Exception {
+    void 짧은_비밀번호로_회원가입_실패() throws Exception {
         mockMvc.perform(post("/api/auth/signup")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
@@ -80,7 +80,7 @@ public class UserControllerTest extends ControllerTestSupport {
 
     @Test
     @DisplayName("로그인 성공")
-    void loginSuccess() throws Exception {
+    void 로그인_성공() throws Exception {
         given(userService.login(any())).willReturn(new TokenResponse("access_token", "refresh_token"));
 
         mockMvc.perform(post("/api/auth/login")
@@ -99,7 +99,7 @@ public class UserControllerTest extends ControllerTestSupport {
 
     @Test
     @DisplayName("토큰 재발급 성공")
-    void reissueSuccess() throws Exception {
+    void 토큰_재발급_성공() throws Exception {
         given(userService.reissue(any())).willReturn(new TokenResponse("new_access", "new_refresh"));
 
         mockMvc.perform(post("/api/auth/reissue")
@@ -112,7 +112,7 @@ public class UserControllerTest extends ControllerTestSupport {
 
     @Test
     @DisplayName("로그아웃 성공")
-    void logoutSuccess() throws Exception {
+    void 로그아웃_성공() throws Exception {
         mockMvc.perform(post("/api/auth/logout")
                         .requestAttr("userId", 1L))
                 .andExpect(status().isOk())

@@ -41,7 +41,7 @@ class TeamControllerTest extends ControllerTestSupport {
     private TeamService teamService;
 
     @Test
-    void createTeamSuccess() throws Exception {
+    void 팀_생성_성공() throws Exception {
         TeamResponse response = new TeamResponse(
                 buildTeamStub(1L, "A팀", LocalDateTime.now()));
         given(teamService.createTeam(any(), eq(1L))).willReturn(response);
@@ -55,7 +55,7 @@ class TeamControllerTest extends ControllerTestSupport {
     }
 
     @Test
-    void createTeamFail_blankName() throws Exception {
+    void 빈_이름으로_팀_생성_실패() throws Exception {
         mockMvc.perform(post("/api/teams")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(Map.of("name", ""))))
@@ -63,7 +63,7 @@ class TeamControllerTest extends ControllerTestSupport {
     }
 
     @Test
-    void getAllTeamsSuccess() throws Exception {
+    void 전체_팀_목록_조회_성공() throws Exception {
         given(teamService.getAllTeams()).willReturn(List.of());
 
         mockMvc.perform(get("/api/teams"))
@@ -71,7 +71,7 @@ class TeamControllerTest extends ControllerTestSupport {
     }
 
     @Test
-    void getTeamDetailSuccess() throws Exception {
+    void 팀_상세_조회_성공() throws Exception {
         TeamDetailResponse response = buildTeamDetailStub(1L, "A팀");
         given(teamService.getTeam(1L)).willReturn(response);
 
@@ -81,7 +81,7 @@ class TeamControllerTest extends ControllerTestSupport {
     }
 
     @Test
-    void addMemberSuccess() throws Exception {
+    void 팀원_추가_성공() throws Exception {
         TeamMemberResponse response = buildMemberStub(100L, 2L, "테스터", TeamMemberRole.MEMBER);
         given(teamService.addMember(eq(1L), any(), eq(1L))).willReturn(response);
 
