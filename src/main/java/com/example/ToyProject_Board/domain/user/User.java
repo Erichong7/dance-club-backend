@@ -35,14 +35,19 @@ public class User {
     @Column(nullable = false)
     private UserRole role = UserRole.USER;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private ApprovalStatus approvalStatus;
+
     @CreatedDate
     private LocalDateTime createdAt;
 
     @Builder
-    public User(String email, String password, String nickname) {
+    public User(String email, String password, String nickname, ApprovalStatus approvalStatus) {
         this.email = email;
         this.password = password;
         this.nickname = nickname;
+        this.approvalStatus = approvalStatus;
     }
 
     public void updateRefreshToken(String refreshToken) {
@@ -51,5 +56,9 @@ public class User {
 
     public void updateRole(UserRole role) {
         this.role = role;
+    }
+
+    public void updateApprovalStatus(ApprovalStatus approvalStatus) {
+        this.approvalStatus = approvalStatus;
     }
 }
