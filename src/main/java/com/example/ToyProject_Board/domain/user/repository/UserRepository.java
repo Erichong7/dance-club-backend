@@ -1,6 +1,6 @@
 package com.example.ToyProject_Board.domain.user.repository;
 
-import com.example.ToyProject_Board.domain.user.ApprovalStatus;
+import com.example.ToyProject_Board.domain.user.SignupStatus;
 import com.example.ToyProject_Board.domain.user.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,5 +15,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Optional<User> findByEmail(String email);
 
-    Page<User> findByApprovalStatusNot(ApprovalStatus approvalStatus, Pageable pageable);
+    Page<User> findBySignupStatusNot(SignupStatus signupStatus, Pageable pageable);
 }

@@ -214,7 +214,7 @@ class AuthServiceTest {
         authService.approve(1L, 2L);
 
         // then
-        assertThat(requested.getApprovalStatus()).isEqualTo(ApprovalStatus.APPROVED);
+        assertThat(requested.getSignupStatus()).isEqualTo(SignupStatus.APPROVED);
     }
 
     @Test
@@ -243,7 +243,7 @@ class AuthServiceTest {
         authService.reject(1L, 2L);
 
         // then
-        assertThat(requested.getApprovalStatus()).isEqualTo(ApprovalStatus.REJECTED);
+        assertThat(requested.getSignupStatus()).isEqualTo(SignupStatus.REJECTED);
     }
 
     @Test

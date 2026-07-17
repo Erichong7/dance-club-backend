@@ -1,6 +1,6 @@
 package com.example.ToyProject_Board.domain.user.service;
 
-import com.example.ToyProject_Board.domain.user.ApprovalStatus;
+import com.example.ToyProject_Board.domain.user.SignupStatus;
 import com.example.ToyProject_Board.domain.user.User;
 import com.example.ToyProject_Board.domain.user.UserRole;
 import com.example.ToyProject_Board.domain.user.dto.request.LoginRequest;
@@ -37,7 +37,7 @@ public class AuthService {
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .nickname(request.getNickname())
-                .approvalStatus(ApprovalStatus.REQUESTED)
+                .signupStatus(SignupStatus.REQUESTED)
                 .build();
 
         userRepository.save(user);
@@ -49,11 +49,11 @@ public class AuthService {
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("이메일 또는 비밀번호가 틀렸습니다"));
 
-        if(user.getApprovalStatus() == ApprovalStatus.REJECTED) {
+        if(user.getSignupStatus() == SignupStatus.REJECTED) {
             throw new RuntimeException("회원가입 요청이 거절되었습니다.");
         }
 
-        if(user.getApprovalStatus() == ApprovalStatus.REQUESTED) {
+        if(user.getSignupStatus() == SignupStatus.REQUESTED) {
             throw new RuntimeException("회원가입 승인 전입니다");
         }
 
@@ -99,7 +99,7 @@ public class AuthService {
     // 회원가입 요청 목록 조회
     public Page<SignupRequestListResponse> getSignupRequests(Long userId, Pageable pageable) {
         verifyAdmin(userId);
-        return userRepository.findByApprovalStatusNot(ApprovalStatus.APPROVED, pageable)
+        return userRepository.findBySignupStatusNot(SignupStatus.APPROVED, pageable)
                 .map(SignupRequestListResponse::new);
     }
 
@@ -108,7 +108,7 @@ public class AuthService {
     public void approve(Long userId, Long requestedId) {
         verifyAdmin(userId);
         User requestedUser = findUserById(requestedId);
-        requestedUser.updateApprovalStatus(ApprovalStatus.APPROVED);
+        requestedUser.updateApprovalStatus(SignupStatus.APPROVED);
     }
     
     // 회원가입 거절
@@ -116,7 +116,7 @@ public class AuthService {
     public void reject(Long userId,Long requestedId) {
         verifyAdmin(userId);
         User requestedUser = findUserById(requestedId);
-        requestedUser.updateApprovalStatus(ApprovalStatus.REJECTED);
+        requestedUser.updateApprovalStatus(SignupStatus.REJECTED);
     }
 
     private @NonNull User findUserById(Long userId) {

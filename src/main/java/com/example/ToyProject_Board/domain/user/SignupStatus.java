@@ -1,6 +1,6 @@
 package com.example.ToyProject_Board.domain.user;
 
-public enum ApprovalStatus {
+public enum SignupStatus {
     REQUESTED,
     APPROVED,
     REJECTED

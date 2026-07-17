@@ -1,6 +1,6 @@
 package com.example.ToyProject_Board.domain.user.dto.response;
 
-import com.example.ToyProject_Board.domain.user.ApprovalStatus;
+import com.example.ToyProject_Board.domain.user.SignupStatus;
 import com.example.ToyProject_Board.domain.user.User;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -21,12 +21,12 @@ public class SignupRequestListResponse {
     private String nickName;
 
     @Schema(description = "사용자의 승인 여부")
-    private ApprovalStatus approvalStatus;
+    private SignupStatus signupStatus;
 
     public SignupRequestListResponse(User user) {
         this.id = user.getId();
         this.email = user.getEmail();
         this.nickName = user.getNickname();
-        this.approvalStatus = user.getApprovalStatus();
+        this.signupStatus = user.getSignupStatus();
     }
 }
