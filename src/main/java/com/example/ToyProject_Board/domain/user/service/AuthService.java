@@ -3,13 +3,16 @@ package com.example.ToyProject_Board.domain.user.service;
 import com.example.ToyProject_Board.domain.user.ApprovalStatus;
 import com.example.ToyProject_Board.domain.user.User;
 import com.example.ToyProject_Board.domain.user.UserRole;
-import com.example.ToyProject_Board.domain.user.dto.LoginRequest;
-import com.example.ToyProject_Board.domain.user.dto.SignupRequest;
-import com.example.ToyProject_Board.domain.user.dto.TokenResponse;
+import com.example.ToyProject_Board.domain.user.dto.request.LoginRequest;
+import com.example.ToyProject_Board.domain.user.dto.request.SignupRequest;
+import com.example.ToyProject_Board.domain.user.dto.response.SignupRequestListResponse;
+import com.example.ToyProject_Board.domain.user.dto.response.TokenResponse;
 import com.example.ToyProject_Board.domain.user.repository.UserRepository;
 import com.example.ToyProject_Board.global.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NonNull;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -91,6 +94,13 @@ public class AuthService {
     public void logout(Long userId) {
         User user = findUserById(userId);
         user.updateRefreshToken(null);
+    }
+
+    // 회원가입 요청 목록 조회
+    public Page<SignupRequestListResponse> getSignupRequests(Long userId, Pageable pageable) {
+        verifyAdmin(userId);
+        return userRepository.findByApprovalStatusNot(ApprovalStatus.APPROVED, pageable)
+                .map(SignupRequestListResponse::new);
     }
 
     // 회원가입 승인

@@ -1,8 +1,9 @@
 package com.example.ToyProject_Board.domain.user.controller;
 
-import com.example.ToyProject_Board.domain.user.dto.LoginRequest;
-import com.example.ToyProject_Board.domain.user.dto.SignupRequest;
-import com.example.ToyProject_Board.domain.user.dto.TokenResponse;
+import com.example.ToyProject_Board.domain.user.dto.request.LoginRequest;
+import com.example.ToyProject_Board.domain.user.dto.request.SignupRequest;
+import com.example.ToyProject_Board.domain.user.dto.response.SignupRequestListResponse;
+import com.example.ToyProject_Board.domain.user.dto.response.TokenResponse;
 import com.example.ToyProject_Board.domain.user.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -13,6 +14,10 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -67,6 +72,17 @@ public class AuthController {
     public ResponseEntity<String> logout(@RequestAttribute("userId") Long userId) {
         authService.logout(userId);
         return ResponseEntity.ok("로그아웃 성공");
+    }
+
+    @Operation(summary = "회원가입 요청 목록", description = "요청된 회원가입들을 조회합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "회원가입 요청 조회 성공")
+    })
+    @GetMapping("/signup-requests")
+    public ResponseEntity<Page<SignupRequestListResponse>> getSignupRequests(
+            @RequestAttribute("userId") Long userId,
+            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+        return ResponseEntity.ok(authService.getSignupRequests(userId, pageable));
     }
 
     @Operation(summary = "회원가입 승인", description = "유저의 회원가입을 승인합니다.")

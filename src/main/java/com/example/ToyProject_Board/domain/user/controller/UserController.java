@@ -1,6 +1,6 @@
 package com.example.ToyProject_Board.domain.user.controller;
 
-import com.example.ToyProject_Board.domain.user.dto.UserDetailResponse;
+import com.example.ToyProject_Board.domain.user.dto.response.UserDetailResponse;
 import com.example.ToyProject_Board.domain.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

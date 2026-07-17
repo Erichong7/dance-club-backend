@@ -1,8 +1,8 @@
 package com.example.ToyProject_Board.domain.user;
 
-import com.example.ToyProject_Board.domain.user.dto.LoginRequest;
-import com.example.ToyProject_Board.domain.user.dto.SignupRequest;
-import com.example.ToyProject_Board.domain.user.dto.TokenResponse;
+import com.example.ToyProject_Board.domain.user.dto.request.LoginRequest;
+import com.example.ToyProject_Board.domain.user.dto.request.SignupRequest;
+import com.example.ToyProject_Board.domain.user.dto.response.TokenResponse;
 import com.example.ToyProject_Board.domain.user.repository.UserRepository;
 import com.example.ToyProject_Board.domain.user.service.AuthService;
 import com.example.ToyProject_Board.global.jwt.JwtUtil;

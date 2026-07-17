@@ -1,4 +1,4 @@
-package com.example.ToyProject_Board.domain.user.dto;
+package com.example.ToyProject_Board.domain.user.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;

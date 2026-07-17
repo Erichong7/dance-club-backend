@@ -2,7 +2,7 @@ package com.example.ToyProject_Board.domain.user.controller;
 
 import com.example.ToyProject_Board.domain.support.ControllerTestSupport;
 import com.example.ToyProject_Board.domain.user.UserRole;
-import com.example.ToyProject_Board.domain.user.dto.UserDetailResponse;
+import com.example.ToyProject_Board.domain.user.dto.response.UserDetailResponse;
 import com.example.ToyProject_Board.domain.user.service.UserService;
 import com.example.ToyProject_Board.global.security.SecurityConfig;
 import org.junit.jupiter.api.DisplayName;

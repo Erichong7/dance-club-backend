@@ -4,7 +4,7 @@ import com.example.ToyProject_Board.domain.team.Team;
 import com.example.ToyProject_Board.domain.team.TeamMember;
 import com.example.ToyProject_Board.domain.team.repository.TeamMemberRepository;
 import com.example.ToyProject_Board.domain.user.User;
-import com.example.ToyProject_Board.domain.user.dto.UserDetailResponse;
+import com.example.ToyProject_Board.domain.user.dto.response.UserDetailResponse;
 import com.example.ToyProject_Board.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

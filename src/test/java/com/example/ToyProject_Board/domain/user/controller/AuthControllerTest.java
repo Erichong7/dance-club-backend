@@ -1,7 +1,7 @@
 package com.example.ToyProject_Board.domain.user.controller;
 
 import com.example.ToyProject_Board.domain.support.ControllerTestSupport;
-import com.example.ToyProject_Board.domain.user.dto.TokenResponse;
+import com.example.ToyProject_Board.domain.user.dto.response.TokenResponse;
 import com.example.ToyProject_Board.domain.user.service.AuthService;
 import com.example.ToyProject_Board.global.security.SecurityConfig;
 import org.junit.jupiter.api.DisplayName;
