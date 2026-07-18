@@ -72,7 +72,6 @@ class ScheduleServiceTest {
         given(performanceRepository.findById(5L)).willReturn(Optional.of(performance));
         given(teamRepository.findById(10L)).willReturn(Optional.of(team));
         given(teamMemberRepository.findByTeamAndUser(team, user)).willReturn(Optional.of(leader));
-        given(scheduleRequestRepository.findByTeamAndPracticeDate(any(), any())).willReturn(List.of());
 
         ScheduleRequest saved = ScheduleRequest.builder()
                 .performance(performance).team(team).submittedBy(user)

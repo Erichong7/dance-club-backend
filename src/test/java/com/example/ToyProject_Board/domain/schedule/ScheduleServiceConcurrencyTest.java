@@ -12,6 +12,7 @@ import com.example.ToyProject_Board.domain.team.TeamMember;
 import com.example.ToyProject_Board.domain.team.TeamMemberRole;
 import com.example.ToyProject_Board.domain.team.repository.TeamMemberRepository;
 import com.example.ToyProject_Board.domain.team.repository.TeamRepository;
+import com.example.ToyProject_Board.domain.user.SignupStatus;
 import com.example.ToyProject_Board.domain.user.User;
 import com.example.ToyProject_Board.domain.user.UserFixture;
 import com.example.ToyProject_Board.domain.user.repository.UserRepository;
@@ -57,7 +58,7 @@ class ScheduleServiceConcurrencyTest {
         // given
         Performance performance = performanceRepository.save(PerformanceFixture.create());
         Team team = teamRepository.save(TeamFixture.create());
-        User leader = userRepository.save(UserFixture.create());
+        User leader = userRepository.save(UserFixture.create("leader@test.com", "팀장", SignupStatus.APPROVED));
         int threadCount = 50;
         ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
         CountDownLatch latch = new CountDownLatch(threadCount);

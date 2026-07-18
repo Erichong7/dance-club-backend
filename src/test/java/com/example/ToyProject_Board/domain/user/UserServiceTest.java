@@ -4,7 +4,9 @@ import com.example.ToyProject_Board.domain.team.Team;
 import com.example.ToyProject_Board.domain.team.TeamMember;
 import com.example.ToyProject_Board.domain.team.TeamMemberRole;
 import com.example.ToyProject_Board.domain.team.repository.TeamMemberRepository;
+import com.example.ToyProject_Board.domain.user.dto.request.UserSearchRequest;
 import com.example.ToyProject_Board.domain.user.dto.response.UserDetailResponse;
+import com.example.ToyProject_Board.domain.user.dto.response.UserSearchResponse;
 import com.example.ToyProject_Board.domain.user.repository.UserRepository;
 import com.example.ToyProject_Board.domain.user.service.UserService;
 import org.junit.jupiter.api.DisplayName;
@@ -13,6 +15,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.List;
@@ -20,6 +26,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
@@ -71,6 +78,56 @@ class UserServiceTest {
 
         // when & then
         assertThatThrownBy(() -> userService.getMyInfo(99L))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("유저를 찾을 수 없습니다");
+    }
+
+    @Test
+    @DisplayName("회원 검색 성공 - 관리자")
+    void 회원_검색_성공() {
+        // given
+        User admin = UserFixture.createAdminWithId(1L);
+        User target = UserFixture.createWithId(2L);
+
+        given(userRepository.findById(1L)).willReturn(Optional.of(admin));
+        given(userRepository.searchUsers(any(UserSearchRequest.class), any(Pageable.class)))
+                .willReturn(new PageImpl<>(List.of(target)));
+
+        // when
+        Page<UserSearchResponse> response = userService.searchUsers(
+                1L, new UserSearchRequest("테스", null, null), PageRequest.of(0, 10));
+
+        // then
+        assertThat(response.getTotalElements()).isEqualTo(1);
+        assertThat(response.getContent().get(0).getId()).isEqualTo(2L);
+        assertThat(response.getContent().get(0).getEmail()).isEqualTo(target.getEmail());
+        assertThat(response.getContent().get(0).getNickName()).isEqualTo(target.getNickname());
+        assertThat(response.getContent().get(0).getRole()).isEqualTo(target.getRole());
+    }
+
+    @Test
+    @DisplayName("회원 검색 실패 - 관리자 아님")
+    void 관리자가_아닌_유저의_회원_검색_실패() {
+        // given
+        User user = UserFixture.createWithId(1L);
+        given(userRepository.findById(1L)).willReturn(Optional.of(user));
+
+        // when & then
+        assertThatThrownBy(() -> userService.searchUsers(
+                1L, new UserSearchRequest(), PageRequest.of(0, 10)))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("관리자 권한이 필요합니다");
+    }
+
+    @Test
+    @DisplayName("회원 검색 실패 - 유저 없음")
+    void 존재하지_않는_유저의_회원_검색_실패() {
+        // given
+        given(userRepository.findById(99L)).willReturn(Optional.empty());
+
+        // when & then
+        assertThatThrownBy(() -> userService.searchUsers(
+                99L, new UserSearchRequest(), PageRequest.of(0, 10)))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessage("유저를 찾을 수 없습니다");
     }

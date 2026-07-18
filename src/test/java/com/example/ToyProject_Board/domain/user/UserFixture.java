@@ -34,4 +34,14 @@ public class UserFixture {
         ReflectionTestUtils.setField(user, "id", id);
         return user;
     }
+
+    // 영속화 테스트용 — signupStatus가 NOT NULL이라 반드시 채워야 함
+    public static User create(String email, String nickname, SignupStatus signupStatus) {
+        return User.builder()
+                .email(email)
+                .password("encoded_password")
+                .nickname(nickname)
+                .signupStatus(signupStatus)
+                .build();
+    }
 }
