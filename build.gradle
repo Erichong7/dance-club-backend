@@ -41,6 +41,12 @@ dependencies {
 
 	// Swagger (OpenAPI)
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.3'
+
+	// QueryDSL (OpenFeign fork — jakarta 네이티브, Hibernate 7 호환)
+	implementation 'io.github.openfeign.querydsl:querydsl-jpa:7.4.0'
+	annotationProcessor 'io.github.openfeign.querydsl:querydsl-apt:7.4.0:jpa'
+	annotationProcessor 'jakarta.persistence:jakarta.persistence-api'
+	annotationProcessor 'jakarta.annotation:jakarta.annotation-api'
 }
 
 tasks.named('test') {

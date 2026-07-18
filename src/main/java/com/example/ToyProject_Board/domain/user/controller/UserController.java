@@ -1,12 +1,18 @@
 package com.example.ToyProject_Board.domain.user.controller;
 
+import com.example.ToyProject_Board.domain.user.dto.request.UserSearchRequest;
 import com.example.ToyProject_Board.domain.user.dto.response.UserDetailResponse;
+import com.example.ToyProject_Board.domain.user.dto.response.UserSearchResponse;
 import com.example.ToyProject_Board.domain.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,5 +31,17 @@ public class UserController {
     @GetMapping("/me")
     public ResponseEntity<UserDetailResponse> getMyInfo(@RequestAttribute("userId") Long userId) {
         return ResponseEntity.ok(userService.getMyInfo(userId));
+    }
+
+    @Operation(summary = "회원 검색", description = "닉네임/이메일 키워드와 가입 상태로 회원을 검색합니다. 관리자 권한이 필요합니다. 정렬은 생성일 내림차순 고정입니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "회원 검색 성공")
+    })
+    @GetMapping("/search")
+    public ResponseEntity<Page<UserSearchResponse>> searchUsers(
+            @RequestAttribute("userId") Long userId,
+            @ModelAttribute UserSearchRequest request,
+            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+        return ResponseEntity.ok(userService.searchUsers(userId, request, pageable));
     }
 }

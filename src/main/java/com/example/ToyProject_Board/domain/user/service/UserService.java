@@ -4,9 +4,14 @@ import com.example.ToyProject_Board.domain.team.Team;
 import com.example.ToyProject_Board.domain.team.TeamMember;
 import com.example.ToyProject_Board.domain.team.repository.TeamMemberRepository;
 import com.example.ToyProject_Board.domain.user.User;
+import com.example.ToyProject_Board.domain.user.UserRole;
+import com.example.ToyProject_Board.domain.user.dto.request.UserSearchRequest;
 import com.example.ToyProject_Board.domain.user.dto.response.UserDetailResponse;
+import com.example.ToyProject_Board.domain.user.dto.response.UserSearchResponse;
 import com.example.ToyProject_Board.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,5 +36,20 @@ public class UserService {
 
         return new UserDetailResponse(user.getId(), user.getEmail(), user.getNickname(), user.getRole(),
                 teamIds, teamNames);
+    }
+
+    // 회원 검색
+    public Page<UserSearchResponse> searchUsers(Long userId, UserSearchRequest request, Pageable pageable) {
+        verifyAdmin(userId);
+        return userRepository.searchUsers(request, pageable)
+                .map(UserSearchResponse::new);
+    }
+
+    private void verifyAdmin(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("유저를 찾을 수 없습니다"));
+        if (user.getRole() != UserRole.ADMIN) {
+            throw new RuntimeException("관리자 권한이 필요합니다");
+        }
     }
 }
