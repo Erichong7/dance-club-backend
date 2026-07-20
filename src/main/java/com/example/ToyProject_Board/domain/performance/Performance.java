@@ -1,5 +1,6 @@
 package com.example.ToyProject_Board.domain.performance;
 
+import com.example.ToyProject_Board.domain.team.Team;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -9,6 +10,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "performances")
@@ -28,6 +30,9 @@ public class Performance {
     private LocalDate performanceDate;
 
     private String description;
+
+    @OneToMany(mappedBy = "performance")
+    private List<Team> teams;
 
     @CreatedDate
     private LocalDateTime createdAt;

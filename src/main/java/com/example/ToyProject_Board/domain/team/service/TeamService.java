@@ -1,5 +1,7 @@
 package com.example.ToyProject_Board.domain.team.service;
 
+import com.example.ToyProject_Board.domain.performance.Performance;
+import com.example.ToyProject_Board.domain.performance.repository.PerformanceRepository;
 import com.example.ToyProject_Board.domain.team.Team;
 import com.example.ToyProject_Board.domain.team.TeamMember;
 import com.example.ToyProject_Board.domain.team.TeamMemberRole;
@@ -27,6 +29,7 @@ public class TeamService {
 
     private final TeamRepository teamRepository;
     private final TeamMemberRepository teamMemberRepository;
+    private final PerformanceRepository performanceRepository;
     private final UserRepository userRepository;
 
     @Transactional
@@ -35,7 +38,12 @@ public class TeamService {
         if (teamRepository.existsByName(request.getName())) {
             throw new RuntimeException("이미 존재하는 팀 이름입니다");
         }
-        Team team = Team.builder().name(request.getName()).build();
+        Performance performance = performanceRepository.findById(request.getPerformanceId())
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 공연입니다."));
+        Team team = Team.builder()
+                .name(request.getName())
+                .performance(performance)
+                .build();
         return new TeamResponse(teamRepository.save(team));
     }
 

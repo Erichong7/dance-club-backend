@@ -1,5 +1,6 @@
 package com.example.ToyProject_Board.domain.team;
 
+import com.example.ToyProject_Board.domain.performance.Performance;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -23,11 +24,16 @@ public class Team {
     @Column(nullable = false, unique = true)
     private String name;
 
+    @ManyToOne
+    @JoinColumn(name = "performance_id")
+    private Performance performance;
+
     @CreatedDate
     private LocalDateTime createdAt;
 
     @Builder
-    public Team(String name) {
+    public Team(String name, Performance performance) {
         this.name = name;
+        this.performance = performance;
     }
 }

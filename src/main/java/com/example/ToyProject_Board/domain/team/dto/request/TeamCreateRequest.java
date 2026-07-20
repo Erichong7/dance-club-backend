@@ -10,6 +10,9 @@ import lombok.NoArgsConstructor;
 @Schema(description = "팀 생성 요청")
 public class TeamCreateRequest {
 
+    @Schema(description = "속한 공연", example = "2026-2학기 정기 공연")
+    private Long performanceId;
+
     @Schema(description = "팀 이름", example = "스트릿댄스팀", minLength = 1)
     @NotBlank
     private String name;

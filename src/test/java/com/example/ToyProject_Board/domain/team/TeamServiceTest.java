@@ -1,5 +1,8 @@
 package com.example.ToyProject_Board.domain.team;
 
+import com.example.ToyProject_Board.domain.performance.Performance;
+import com.example.ToyProject_Board.domain.performance.PerformanceFixture;
+import com.example.ToyProject_Board.domain.performance.repository.PerformanceRepository;
 import com.example.ToyProject_Board.domain.team.dto.request.AddMemberRequest;
 import com.example.ToyProject_Board.domain.team.dto.request.TeamCreateRequest;
 import com.example.ToyProject_Board.domain.team.dto.response.TeamMemberResponse;
@@ -37,6 +40,9 @@ class TeamServiceTest {
     private TeamMemberRepository teamMemberRepository;
 
     @Mock
+    private PerformanceRepository performanceRepository;
+
+    @Mock
     private UserRepository userRepository;
 
     @Test
@@ -45,11 +51,15 @@ class TeamServiceTest {
         given(userRepository.findById(1L)).willReturn(Optional.of(admin));
         given(teamRepository.existsByName("신규팀")).willReturn(false);
 
+        Performance performance = PerformanceFixture.createWithId(100L);
+        given(performanceRepository.findById(100L)).willReturn(Optional.of(performance));
+
         Team savedTeam = TeamFixture.createWithNameAndId("신규팀", 10L);
         given(teamRepository.save(any())).willReturn(savedTeam);
 
         TeamCreateRequest request = new TeamCreateRequest();
         ReflectionTestUtils.setField(request, "name", "신규팀");
+        ReflectionTestUtils.setField(request, "performanceId", 100L);
 
         TeamResponse response = teamService.createTeam(request, 1L);
 
