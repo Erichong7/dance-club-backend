@@ -8,6 +8,7 @@ import com.example.ToyProject_Board.domain.user.dto.request.SignupRequest;
 import com.example.ToyProject_Board.domain.user.dto.response.SignupRequestListResponse;
 import com.example.ToyProject_Board.domain.user.dto.response.TokenResponse;
 import com.example.ToyProject_Board.domain.user.repository.UserRepository;
+import com.example.ToyProject_Board.global.exception.AuthException;
 import com.example.ToyProject_Board.global.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NonNull;
@@ -47,18 +48,18 @@ public class AuthService {
     @Transactional
     public TokenResponse login(LoginRequest request) {
         User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("이메일 또는 비밀번호가 틀렸습니다"));
+                .orElseThrow(() -> new AuthException("INVALID_CREDENTIALS", "이메일 또는 비밀번호가 틀렸습니다"));
 
         if(user.getSignupStatus() == SignupStatus.REJECTED) {
-            throw new RuntimeException("회원가입 요청이 거절되었습니다.");
+            throw new AuthException("SIGNUP_REJECTED", "회원가입 요청이 거절되었습니다.");
         }
 
         if(user.getSignupStatus() == SignupStatus.REQUESTED) {
-            throw new RuntimeException("회원가입 승인 전입니다");
+            throw new AuthException("SIGNUP_PENDING", "회원가입 승인 전입니다");
         }
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new RuntimeException("이메일 또는 비밀번호가 틀렸습니다");
+            throw new AuthException("INVALID_CREDENTIALS", "이메일 또는 비밀번호가 틀렸습니다");
         }
 
         String accessToken = jwtUtil.generateAccessToken(user.getId());
