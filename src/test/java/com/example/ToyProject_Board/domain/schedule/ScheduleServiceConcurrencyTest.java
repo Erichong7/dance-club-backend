@@ -23,6 +23,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -71,9 +72,8 @@ class ScheduleServiceConcurrencyTest {
                            .performance(performance)
                            .team(team)
                            .submittedBy(leader)
-                           .practiceDate(LocalDate.now().plusWeeks(1))
-                           .startTime(LocalTime.of(18, 0))
-                           .endTime(LocalTime.of(20, 0))
+                           .startAt(LocalDateTime.of(LocalDate.now().plusWeeks(1), LocalTime.of(18, 0)))
+                           .endAt(LocalDateTime.of(LocalDate.now().plusWeeks(1), LocalTime.of(20, 0)))
                            .alternativeRoom(RoomType.EXTERNAL)
                            .build();
                    scheduleRequestRepository.save(scheduleRequest);

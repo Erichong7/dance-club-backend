@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
@@ -65,20 +66,17 @@ public class ScheduleService {
             throw new RuntimeException("팀장 또는 부팀장만 신청할 수 있습니다");
         }
 
-        LocalDate practiceDate = request.getPracticeDate();
-        LocalTime startTime = request.getStartTime();
-        LocalTime endTime = request.getEndTime();
+        TimeRange range = toOvernightAwareRange(request.getPracticeDate(), request.getStartTime(), request.getEndTime());
 
-        validateDeadline(practiceDate);
+        validateDeadline(range.start().toLocalDate());
 //        validateDailyLimit(team, practiceDate, startTime, endTime);
 
         ScheduleRequest scheduleRequest = ScheduleRequest.builder()
                 .performance(performance)
                 .team(team)
                 .submittedBy(user)
-                .practiceDate(practiceDate)
-                .startTime(startTime)
-                .endTime(endTime)
+                .startAt(range.start())
+                .endAt(range.end())
                 .alternativeRoom(request.getAlternativeRoom())
                 .build();
         return new ScheduleResponse(scheduleRequestRepository.save(scheduleRequest));
@@ -88,7 +86,8 @@ public class ScheduleService {
         Performance performance = findPerformanceById(performanceId);
         LocalDate weekEnd = weekStart.plusDays(6);
         return scheduleRequestRepository
-                .findByPerformanceAndPracticeDateBetween(performance, weekStart, weekEnd, pageable)
+                .findByPerformanceAndStartAtBetween(
+                        performance, weekStart.atStartOfDay(), LocalDateTime.of(weekEnd, LocalTime.MAX), pageable)
                 .map(ScheduleResponse::new);
     }
 
@@ -144,13 +143,14 @@ public class ScheduleService {
                 .map(TeamMember::getUser)
                 .orElseThrow(() -> new RuntimeException("팀에 리더가 존재하지 않습니다."));
 
+        TimeRange range = toOvernightAwareRange(request.getPracticeDate(), request.getStartTime(), request.getEndTime());
+
         ScheduleRequest scheduleRequest = ScheduleRequest.builder()
                 .performance(performance)
                 .team(team)
                 .submittedBy(leader)
-                .practiceDate(request.getPracticeDate())
-                .startTime(request.getStartTime())
-                .endTime(request.getEndTime())
+                .startAt(range.start())
+                .endAt(range.end())
                 .alternativeRoom(request.getRoom())
                 .build();
         scheduleRequest.approve(request.getRoom());
@@ -176,30 +176,28 @@ public class ScheduleService {
         LocalDate weekEnd = weekStart.plusDays(6);
 
         List<ScheduleRequest> requests = scheduleRequestRepository
-                .findByPerformanceAndPracticeDateBetweenAndStatusOrderByCreatedAtAsc(
-                        performance, weekStart, weekEnd, ScheduleStatus.PENDING);
+                .findByPerformanceAndStartAtBetweenAndStatusOrderByCreatedAtAsc(
+                        performance, weekStart.atStartOfDay(), LocalDateTime.of(weekEnd, LocalTime.MAX), ScheduleStatus.PENDING);
 
-        // 슬롯 추적: date → list of (start, end) pairs
-        Map<LocalDate, List<long[]>> clubRoomSlots = new HashMap<>();
-        Map<LocalDate, List<long[]>> studentUnionSlots = new HashMap<>();
-        // 치어룸 카운트: date → 배정된 팀 수
+        // 슬롯 추적: 자정을 넘기는 연습도 정확히 비교할 수 있도록 날짜로 나누지 않고 구간 목록으로 관리
+        List<TimeRange> clubRoomSlots = new ArrayList<>();
+        List<TimeRange> studentUnionSlots = new ArrayList<>();
+        // 치어룸 카운트: date → 배정된 팀 수 (치어룸 창은 항상 같은 날 안에서만 성립하므로 날짜 키 유효)
         Map<LocalDate, Integer> cheerRoomCount = new HashMap<>();
         // 이번 주 동방 배정받은 팀 ID
         Set<Long> teamsWithClubRoom = new HashSet<>();
 
         for (ScheduleRequest request : requests) {
-            LocalDate date = request.getPracticeDate();
-            LocalTime start = request.getStartTime();
-            LocalTime end = request.getEndTime();
+            LocalDateTime start = request.getStartAt();
+            LocalDateTime end = request.getEndAt();
             Long teamId = request.getTeam().getId();
             boolean assigned = false;
 
             // 1. 동방: 이번 주 동방 미배정 팀에게 우선
             if (!teamsWithClubRoom.contains(teamId)) {
-                if (noConflict(clubRoomSlots.getOrDefault(date, List.of()), start, end)) {
+                if (noConflict(clubRoomSlots, start, end)) {
                     request.approve(RoomType.CLUB_ROOM);
-                    clubRoomSlots.computeIfAbsent(date, k -> new ArrayList<>())
-                            .add(toMinutes(start, end));
+                    clubRoomSlots.add(new TimeRange(start, end));
                     teamsWithClubRoom.add(teamId);
                     assigned = true;
                 }
@@ -207,20 +205,20 @@ public class ScheduleService {
 
             // 2. 학생회관 지하
             if (!assigned) {
-                if (noConflict(studentUnionSlots.getOrDefault(date, List.of()), start, end)) {
+                if (noConflict(studentUnionSlots, start, end)) {
                     request.approve(RoomType.STUDENT_UNION_BASEMENT);
-                    studentUnionSlots.computeIfAbsent(date, k -> new ArrayList<>())
-                            .add(toMinutes(start, end));
+                    studentUnionSlots.add(new TimeRange(start, end));
                     assigned = true;
                 }
             }
 
             // 3. 치어룸 (수요일 18:30~20:30 이내만)
-            if (!assigned && isWithinCheerRoomWindow(date, start, end)) {
-                int count = cheerRoomCount.getOrDefault(date, 0);
+            if (!assigned && isWithinCheerRoomWindow(start, end)) {
+                LocalDate cheerDate = start.toLocalDate();
+                int count = cheerRoomCount.getOrDefault(cheerDate, 0);
                 if (count < CHEER_ROOM_MAX_TEAMS) {
                     request.approve(RoomType.CHEER_ROOM);
-                    cheerRoomCount.put(date, count + 1);
+                    cheerRoomCount.put(cheerDate, count + 1);
                     assigned = true;
                 }
             }
@@ -272,21 +270,33 @@ public class ScheduleService {
 //        }
 //    }
 
-    // toMinutes: [startMinuteOfDay, endMinuteOfDay]
-    private long[] toMinutes(LocalTime start, LocalTime end) {
-        return new long[]{start.toSecondOfDay() / 60L, end.toSecondOfDay() / 60L};
+    private record TimeRange(LocalDateTime start, LocalDateTime end) {}
+
+    // 시작 시각과 종료 시각으로 구간을 만들되, 종료가 시작보다 앞서면(예: 23:00 → 02:00) 익일 종료로 간주
+    private TimeRange toOvernightAwareRange(LocalDate date, LocalTime startTime, LocalTime endTime) {
+        if (startTime.equals(endTime)) {
+            throw new RuntimeException("시작 시간과 종료 시간이 같을 수 없습니다");
+        }
+        LocalDateTime start = LocalDateTime.of(date, startTime);
+        LocalDateTime end = LocalDateTime.of(date, endTime);
+        if (end.isBefore(start)) { // 익일 종료
+            end = end.plusDays(1);
+        }
+        return new TimeRange(start, end);
     }
 
-    private boolean noConflict(List<long[]> slots, LocalTime start, LocalTime end) {
-        long s = start.toSecondOfDay() / 60L;
-        long e = end.toSecondOfDay() / 60L;
-        return slots.stream().noneMatch(slot -> slot[0] < e && slot[1] > s);
+    private boolean noConflict(List<TimeRange> slots, LocalDateTime start, LocalDateTime end) {
+        return slots.stream().noneMatch(slot -> slot.start().isBefore(end) && slot.end().isAfter(start));
     }
 
-    private boolean isWithinCheerRoomWindow(LocalDate date, LocalTime start, LocalTime end) {
-        return date.getDayOfWeek() == DayOfWeek.WEDNESDAY
-                && !start.isBefore(CHEER_ROOM_START)
-                && !end.isAfter(CHEER_ROOM_END);
+    private boolean isWithinCheerRoomWindow(LocalDateTime start, LocalDateTime end) {
+        LocalDate date = start.toLocalDate();
+        if (date.getDayOfWeek() != DayOfWeek.WEDNESDAY) {
+            return false;
+        }
+        LocalDateTime windowStart = LocalDateTime.of(date, CHEER_ROOM_START);
+        LocalDateTime windowEnd = LocalDateTime.of(date, CHEER_ROOM_END);
+        return !start.isBefore(windowStart) && !end.isAfter(windowEnd);
     }
 
     private ScheduleRequest findScheduleById(Long id) {

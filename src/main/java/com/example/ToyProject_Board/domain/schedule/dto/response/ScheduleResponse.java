@@ -32,14 +32,20 @@ public class ScheduleResponse {
     @Schema(description = "신청자 닉네임", example = "홍길동")
     private final String submittedByNickname;
 
-    @Schema(description = "연습 희망 날짜", example = "2026-07-15")
-    private final LocalDate practiceDate;
+//    @Schema(description = "연습 희망 날짜", example = "2026-07-15")
+//    private final LocalDate practiceDate;
+//
+//    @Schema(description = "연습 시작 시간", example = "18:00:00")
+//    private final LocalTime startTime;
+//
+//    @Schema(description = "연습 종료 시간", example = "20:00:00")
+//    private final LocalTime endTime;
 
-    @Schema(description = "연습 시작 시간", example = "18:00:00")
-    private final LocalTime startTime;
+    @Schema(description = "연습 희망 시작 날짜시간", example = "2026-07-21T20:37:00.123")
+    private final LocalDateTime startAt;
 
-    @Schema(description = "연습 종료 시간", example = "20:00:00")
-    private final LocalTime endTime;
+    @Schema(description = "연습 희망 종료 날짜시간", example = "2026-07-21T20:37:00.123")
+    private final LocalDateTime endAt;
 
     @Schema(description = "배정된 연습실 (미배정 시 null)", example = "CLUB_ROOM")
     private final RoomType assignedRoom;
@@ -63,9 +69,8 @@ public class ScheduleResponse {
         this.teamId = request.getTeam().getId();
         this.teamName = request.getTeam().getName();
         this.submittedByNickname = request.getSubmittedBy().getNickname();
-        this.practiceDate = request.getPracticeDate();
-        this.startTime = request.getStartTime();
-        this.endTime = request.getEndTime();
+        this.startAt = request.getStartAt();
+        this.endAt = request.getEndAt();
         this.assignedRoom = request.getAssignedRoom();
         this.status = request.getStatus();
         this.adminNote = request.getAdminNote();

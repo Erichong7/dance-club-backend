@@ -51,7 +51,7 @@ public class ScheduleController {
             @Parameter(description = "대상 공연 ID", example = "1") @RequestParam Long performanceId,
             @Parameter(description = "조회할 주의 시작일 (월요일 등 기준일)", example = "2026-07-13")
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate weekStart,
-            @PageableDefault(size = 20, sort = "practiceDate", direction = Sort.Direction.ASC) Pageable pageable) {
+            @PageableDefault(size = 20, sort = "startAt", direction = Sort.Direction.ASC) Pageable pageable) {
         return ResponseEntity.ok(scheduleService.getByWeek(performanceId, weekStart, pageable));
     }
 
@@ -69,7 +69,7 @@ public class ScheduleController {
     public ResponseEntity<Page<ScheduleResponse>> getByTeam(
             @Parameter(description = "팀 ID", example = "1") @PathVariable Long teamId,
             @RequestAttribute("userId") Long userId,
-            @PageableDefault(size = 20, sort = "practiceDate", direction = Sort.Direction.DESC) Pageable pageable) {
+            @PageableDefault(size = 20, sort = "startAt", direction = Sort.Direction.DESC) Pageable pageable) {
         return ResponseEntity.ok(scheduleService.getByTeam(teamId, userId, pageable));
     }
 

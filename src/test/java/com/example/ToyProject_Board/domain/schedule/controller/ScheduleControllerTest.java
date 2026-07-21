@@ -22,6 +22,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
@@ -115,9 +116,8 @@ class ScheduleControllerTest extends ControllerTestSupport {
 
         ScheduleRequest request = ScheduleRequest.builder()
                 .performance(performance).team(team).submittedBy(user)
-                .practiceDate(LocalDate.now().plusDays(7))
-                .startTime(LocalTime.of(18, 0))
-                .endTime(LocalTime.of(20, 0))
+                .startAt(LocalDateTime.of(LocalDate.now().plusDays(7), LocalTime.of(18, 0)))
+                .endAt(LocalDateTime.of(LocalDate.now().plusDays(7), LocalTime.of(20, 0)))
                 .build();
         ReflectionTestUtils.setField(request, "id", 100L);
         ReflectionTestUtils.setField(request, "status", ScheduleStatus.PENDING);

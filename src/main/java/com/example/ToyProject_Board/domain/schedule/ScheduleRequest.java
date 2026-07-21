@@ -11,9 +11,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 
 @Entity
 @Table(name = "schedule_requests")
@@ -38,14 +36,20 @@ public class ScheduleRequest {
     @JoinColumn(name = "submitted_by", nullable = false)
     private User submittedBy;
 
-    @Column(nullable = false)
-    private LocalDate practiceDate;
+//    @Column(nullable = false)
+//    private LocalDate practiceDate;
+//
+//    @Column(nullable = false)
+//    private LocalTime startTime;
+//
+//    @Column(nullable = false)
+//    private LocalTime endTime;
 
     @Column(nullable = false)
-    private LocalTime startTime;
+    private LocalDateTime startAt;
 
     @Column(nullable = false)
-    private LocalTime endTime;
+    private LocalDateTime endAt;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -68,14 +72,12 @@ public class ScheduleRequest {
 
     @Builder
     public ScheduleRequest(Performance performance, Team team, User submittedBy,
-                           LocalDate practiceDate, LocalTime startTime, LocalTime endTime, RoomType alternativeRoom) {
+                           LocalDateTime startAt, LocalDateTime endAt, RoomType alternativeRoom) {
         this.performance = performance;
         this.team = team;
         this.submittedBy = submittedBy;
-        this.practiceDate = practiceDate;
-        this.startTime = startTime;
-        this.endTime = endTime;
-        this.status = ScheduleStatus.PENDING;
+        this.startAt = startAt;
+        this.endAt = endAt;
         this.alternativeRoom = alternativeRoom;
     }
 

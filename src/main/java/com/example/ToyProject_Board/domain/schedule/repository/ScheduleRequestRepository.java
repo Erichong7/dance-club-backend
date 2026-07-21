@@ -8,18 +8,18 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface ScheduleRequestRepository extends JpaRepository<ScheduleRequest, Long> {
 
-    List<ScheduleRequest> findByTeamAndPracticeDate(Team team, LocalDate practiceDate);
+    List<ScheduleRequest> findByTeamAndStartAtBetween(Team team, LocalDateTime start, LocalDateTime end);
 
-    List<ScheduleRequest> findByPerformanceAndPracticeDateBetweenAndStatusOrderByCreatedAtAsc(
-            Performance performance, LocalDate start, LocalDate end, ScheduleStatus status);
+    List<ScheduleRequest> findByPerformanceAndStartAtBetweenAndStatusOrderByCreatedAtAsc(
+            Performance performance, LocalDateTime start, LocalDateTime end, ScheduleStatus status);
 
-    Page<ScheduleRequest> findByPerformanceAndPracticeDateBetween(
-            Performance performance, LocalDate start, LocalDate end, Pageable pageable);
+    Page<ScheduleRequest> findByPerformanceAndStartAtBetween(
+            Performance performance, LocalDateTime start, LocalDateTime end, Pageable pageable);
 
     Page<ScheduleRequest> findByTeam(Team team, Pageable pageable);
 }
