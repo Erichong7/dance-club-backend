@@ -109,6 +109,15 @@ public class TeamService {
     }
 
     @Transactional
+    public void delete(Long teamId, Long userId) {
+        verifyAdmin(userId);
+        if(!teamRepository.existsById(teamId)) {
+            throw new RuntimeException("팀을 찾을 수 없습니다");
+        }
+        teamRepository.deleteById(teamId);
+    }
+
+    @Transactional
     public void removeMember(Long teamId, Long userId, Long adminUserId) {
         verifyAdmin(adminUserId);
         Team team = findTeamById(teamId);

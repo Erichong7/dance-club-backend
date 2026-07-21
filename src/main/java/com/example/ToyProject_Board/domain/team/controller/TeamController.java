@@ -81,6 +81,16 @@ public class TeamController {
         return ResponseEntity.ok(teamService.updateMemberRole(id, targetUserId, request, userId));
     }
 
+    @Operation(summary = "팀 제거", description = "팀을 제거합니다.")
+    @ApiResponse(responseCode = "204", description = "팀 제거 성공")
+    @DeleteMapping("/{teamId}")
+    public ResponseEntity<Void> delete(
+            @Parameter(description = "팀 ID", example = "1") @PathVariable Long teamId,
+            @RequestAttribute("userId") Long userId) {
+        teamService.delete(teamId, userId);
+        return ResponseEntity.noContent().build();
+    }
+
     @Operation(summary = "팀원 제거", description = "팀에서 특정 팀원을 제거합니다.")
     @ApiResponse(responseCode = "204", description = "팀원 제거 성공")
     @DeleteMapping("/{id}/members/{targetUserId}")
