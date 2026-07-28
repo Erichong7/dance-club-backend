@@ -65,8 +65,7 @@ class ScheduleControllerTest extends ControllerTestSupport {
                                 "startTime", "18:00:00",
                                 "endTime", "20:00:00",
                                 "alternativeRoom", "UNDERGROUND_PARKING"
-                        )))
-                        .requestAttr("userId", 1L))
+                        ))))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("PENDING"));
     }
@@ -99,15 +98,13 @@ class ScheduleControllerTest extends ControllerTestSupport {
 
         mockMvc.perform(post("/api/schedules/assign")
                         .param("performanceId", "5")
-                        .param("weekStart", "2024-12-02")
-                        .requestAttr("userId", 1L))
+                        .param("weekStart", "2024-12-02"))
                 .andExpect(status().isOk());
     }
 
     @Test
     void 일정_취소_성공() throws Exception {
-        mockMvc.perform(post("/api/schedules/100/cancel")
-                        .requestAttr("userId", 1L))
+        mockMvc.perform(post("/api/schedules/100/cancel"))
                 .andExpect(status().isNoContent());
     }
 

@@ -51,8 +51,7 @@ public class UserControllerTest extends ControllerTestSupport {
                 1L, "test@test.com", "테스터", UserRole.USER, List.of(10L), List.of("댄스팀"));
         given(userService.getMyInfo(1L)).willReturn(response);
 
-        mockMvc.perform(get("/api/users/me")
-                        .requestAttr("userId", 1L))
+        mockMvc.perform(get("/api/users/me"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1L))
                 .andExpect(jsonPath("$.email").value("test@test.com"))
@@ -73,8 +72,7 @@ public class UserControllerTest extends ControllerTestSupport {
 
         mockMvc.perform(get("/api/users/search")
                         .param("nickname", "테스")
-                        .param("signupStatus", "APPROVED")
-                        .requestAttr("userId", 1L))
+                        .param("signupStatus", "APPROVED"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[0].id").value(2L))
                 .andExpect(jsonPath("$.content[0].email").value("target@test.com"))

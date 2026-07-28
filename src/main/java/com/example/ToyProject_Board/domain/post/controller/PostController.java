@@ -18,6 +18,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "Post", description = "게시글 CRUD API")
@@ -36,7 +37,7 @@ public class PostController {
     @PostMapping
     public ResponseEntity<PostResponse> createPost(
             @Valid @RequestBody PostCreateRequest request,
-            @RequestAttribute("userId") Long userId) {
+            @AuthenticationPrincipal Long userId) {
         return ResponseEntity.ok(postService.create(request, userId));
     }
 
@@ -68,7 +69,7 @@ public class PostController {
     public ResponseEntity<PostResponse> update(
             @Parameter(description = "게시글 ID", example = "1") @PathVariable Long id,
             @Valid @RequestBody PostUpdateRequest request,
-            @RequestAttribute("userId") Long userId) {
+            @AuthenticationPrincipal Long userId) {
         return ResponseEntity.ok(postService.update(id, request, userId));
     }
 
@@ -77,7 +78,7 @@ public class PostController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(
             @Parameter(description = "게시글 ID", example = "1") @PathVariable Long id,
-            @RequestAttribute("userId") Long userId) {
+            @AuthenticationPrincipal Long userId) {
         postService.delete(id, userId);
         return ResponseEntity.noContent().build();
     }

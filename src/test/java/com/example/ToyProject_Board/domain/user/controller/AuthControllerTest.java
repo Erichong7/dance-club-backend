@@ -138,8 +138,7 @@ public class AuthControllerTest extends ControllerTestSupport {
     @Test
     @DisplayName("로그아웃 성공")
     void 로그아웃_성공() throws Exception {
-        mockMvc.perform(post("/api/auth/logout")
-                        .requestAttr("userId", 1L))
+        mockMvc.perform(post("/api/auth/logout"))
                 .andExpect(status().isOk())
                 .andDo(print());
     }
@@ -147,8 +146,7 @@ public class AuthControllerTest extends ControllerTestSupport {
     @Test
     @DisplayName("회원가입 승인 성공")
     void 회원가입_승인_성공() throws Exception {
-        mockMvc.perform(patch("/api/auth/2/approve")
-                        .requestAttr("userId", 1L))
+        mockMvc.perform(patch("/api/auth/2/approve"))
                 .andExpect(status().isOk())
                 .andDo(print());
 
@@ -158,8 +156,7 @@ public class AuthControllerTest extends ControllerTestSupport {
     @Test
     @DisplayName("회원가입 거절 성공")
     void 회원가입_거절_성공() throws Exception {
-        mockMvc.perform(patch("/api/auth/2/reject")
-                        .requestAttr("userId", 1L))
+        mockMvc.perform(patch("/api/auth/2/reject"))
                 .andExpect(status().isOk())
                 .andDo(print());
 

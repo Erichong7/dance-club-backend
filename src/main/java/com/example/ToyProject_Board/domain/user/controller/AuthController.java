@@ -19,6 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "Auth", description = "회원가입, 로그인 등 인증 관련 API")
@@ -69,7 +70,7 @@ public class AuthController {
             @ApiResponse(responseCode = "200", description = "로그아웃 성공")
     })
     @PostMapping("/logout")
-    public ResponseEntity<String> logout(@RequestAttribute("userId") Long userId) {
+    public ResponseEntity<String> logout(@AuthenticationPrincipal Long userId) {
         authService.logout(userId);
         return ResponseEntity.ok("로그아웃 성공");
     }
@@ -80,7 +81,7 @@ public class AuthController {
     })
     @GetMapping("/signup-requests")
     public ResponseEntity<Page<SignupRequestListResponse>> getSignupRequests(
-            @RequestAttribute("userId") Long userId,
+            @AuthenticationPrincipal Long userId,
             @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         return ResponseEntity.ok(authService.getSignupRequests(userId, pageable));
     }
@@ -90,7 +91,7 @@ public class AuthController {
             @ApiResponse(responseCode = "200", description = "회원가입 승인 성공")
     })
     @PatchMapping("/{requestedId}/approve")
-    public ResponseEntity<String> approve(@RequestAttribute("userId") Long userId, @PathVariable Long requestedId) {
+    public ResponseEntity<String> approve(@AuthenticationPrincipal Long userId, @PathVariable Long requestedId) {
         authService.approve(userId, requestedId);
         return ResponseEntity.ok("회원가입 승인 성공");
     }
@@ -100,7 +101,7 @@ public class AuthController {
             @ApiResponse(responseCode = "200", description = "회원가입 거절 성공")
     })
     @PatchMapping("/{requestedId}/reject")
-    public ResponseEntity<String> reject(@RequestAttribute("userId") Long userId, @PathVariable Long requestedId) {
+    public ResponseEntity<String> reject(@AuthenticationPrincipal Long userId, @PathVariable Long requestedId) {
         authService.reject(userId, requestedId);
         return ResponseEntity.ok("회원가입 거절 성공");
     }

@@ -14,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "User", description = "사용자 정보 조회 API")
@@ -29,7 +30,7 @@ public class UserController {
             @ApiResponse(responseCode = "200", description = "사용자 정보 조회 성공")
     })
     @GetMapping("/me")
-    public ResponseEntity<UserDetailResponse> getMyInfo(@RequestAttribute("userId") Long userId) {
+    public ResponseEntity<UserDetailResponse> getMyInfo(@AuthenticationPrincipal Long userId) {
         return ResponseEntity.ok(userService.getMyInfo(userId));
     }
 
@@ -39,7 +40,7 @@ public class UserController {
     })
     @GetMapping("/search")
     public ResponseEntity<Page<UserSearchResponse>> searchUsers(
-            @RequestAttribute("userId") Long userId,
+            @AuthenticationPrincipal Long userId,
             @ModelAttribute UserSearchRequest request,
             @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         return ResponseEntity.ok(userService.searchUsers(userId, request, pageable));

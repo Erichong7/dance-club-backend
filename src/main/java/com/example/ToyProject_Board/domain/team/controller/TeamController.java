@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -35,7 +36,7 @@ public class TeamController {
     @PostMapping
     public ResponseEntity<TeamResponse> create(
             @Valid @RequestBody TeamCreateRequest request,
-            @RequestAttribute("userId") Long userId) {
+            @AuthenticationPrincipal Long userId) {
         return ResponseEntity.ok(teamService.createTeam(request, userId));
     }
 
@@ -63,7 +64,7 @@ public class TeamController {
     public ResponseEntity<TeamMemberResponse> addMember(
             @Parameter(description = "팀 ID", example = "1") @PathVariable Long id,
             @Valid @RequestBody AddMemberRequest request,
-            @RequestAttribute("userId") Long userId) {
+            @AuthenticationPrincipal Long userId) {
         return ResponseEntity.ok(teamService.addMember(id, request, userId));
     }
 
@@ -77,7 +78,7 @@ public class TeamController {
             @Parameter(description = "팀 ID", example = "1") @PathVariable Long id,
             @Parameter(description = "역할을 변경할 대상 사용자 ID", example = "2") @PathVariable Long targetUserId,
             @Valid @RequestBody UpdateMemberRoleRequest request,
-            @RequestAttribute("userId") Long userId) {
+            @AuthenticationPrincipal Long userId) {
         return ResponseEntity.ok(teamService.updateMemberRole(id, targetUserId, request, userId));
     }
 
@@ -86,7 +87,7 @@ public class TeamController {
     @DeleteMapping("/{teamId}")
     public ResponseEntity<Void> delete(
             @Parameter(description = "팀 ID", example = "1") @PathVariable Long teamId,
-            @RequestAttribute("userId") Long userId) {
+            @AuthenticationPrincipal Long userId) {
         teamService.delete(teamId, userId);
         return ResponseEntity.noContent().build();
     }
@@ -97,7 +98,7 @@ public class TeamController {
     public ResponseEntity<Void> removeMember(
             @Parameter(description = "팀 ID", example = "1") @PathVariable Long id,
             @Parameter(description = "제거할 대상 사용자 ID", example = "2") @PathVariable Long targetUserId,
-            @RequestAttribute("userId") Long userId) {
+            @AuthenticationPrincipal Long userId) {
         teamService.removeMember(id, targetUserId, userId);
         return ResponseEntity.noContent().build();
     }

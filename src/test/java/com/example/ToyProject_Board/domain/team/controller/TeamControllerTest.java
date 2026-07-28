@@ -50,8 +50,7 @@ class TeamControllerTest extends ControllerTestSupport {
 
         mockMvc.perform(post("/api/teams")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(Map.of("name", "A팀")))
-                        .requestAttr("userId", 1L))
+                        .content(objectMapper.writeValueAsString(Map.of("name", "A팀"))))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("A팀"));
     }
@@ -90,8 +89,7 @@ class TeamControllerTest extends ControllerTestSupport {
         mockMvc.perform(post("/api/teams/1/members")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(
-                                Map.of("userId", 2, "role", "MEMBER")))
-                        .requestAttr("userId", 1L))
+                                Map.of("userId", 2, "role", "MEMBER"))))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.role").value("MEMBER"));
     }

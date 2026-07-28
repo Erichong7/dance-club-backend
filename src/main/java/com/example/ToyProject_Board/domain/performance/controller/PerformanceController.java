@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -31,7 +32,7 @@ public class PerformanceController {
     @PostMapping
     public ResponseEntity<PerformanceResponse> create(
             @Valid @RequestBody PerformanceCreateRequest request,
-            @RequestAttribute("userId") Long userId) {
+            @AuthenticationPrincipal Long userId) {
         return ResponseEntity.ok(performanceService.create(request, userId));
     }
 
@@ -55,7 +56,7 @@ public class PerformanceController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(
             @Parameter(description = "공연 ID", example = "1") @PathVariable Long id,
-            @RequestAttribute("userId") Long userId) {
+            @AuthenticationPrincipal Long userId) {
         performanceService.delete(id, userId);
         return ResponseEntity.noContent().build();
     }

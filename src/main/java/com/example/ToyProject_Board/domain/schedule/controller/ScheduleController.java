@@ -19,6 +19,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -40,7 +41,7 @@ public class ScheduleController {
     @PostMapping
     public ResponseEntity<ScheduleResponse> create(
             @Valid @RequestBody ScheduleCreateRequest request,
-            @RequestAttribute("userId") Long userId) {
+            @AuthenticationPrincipal Long userId) {
         return ResponseEntity.ok(scheduleService.create(request, userId));
     }
 
@@ -68,7 +69,7 @@ public class ScheduleController {
     @GetMapping("/team/{teamId}")
     public ResponseEntity<Page<ScheduleResponse>> getByTeam(
             @Parameter(description = "팀 ID", example = "1") @PathVariable Long teamId,
-            @RequestAttribute("userId") Long userId,
+            @AuthenticationPrincipal Long userId,
             @PageableDefault(size = 20, sort = "startAt", direction = Sort.Direction.DESC) Pageable pageable) {
         return ResponseEntity.ok(scheduleService.getByTeam(teamId, userId, pageable));
     }
@@ -78,7 +79,7 @@ public class ScheduleController {
     @PostMapping("/{id}/cancel")
     public ResponseEntity<Void> cancel(
             @Parameter(description = "연습 일정 ID", example = "1") @PathVariable Long id,
-            @RequestAttribute("userId") Long userId) {
+            @AuthenticationPrincipal Long userId) {
         scheduleService.cancel(id, userId);
         return ResponseEntity.noContent().build();
     }
@@ -89,7 +90,7 @@ public class ScheduleController {
     public ResponseEntity<ScheduleResponse> reject(
             @Parameter(description = "연습 일정 ID", example = "1") @PathVariable Long id,
             @RequestBody ScheduleRejectRequest request,
-            @RequestAttribute("userId") Long userId) {
+            @AuthenticationPrincipal Long userId) {
         return ResponseEntity.ok(scheduleService.reject(id, request, userId));
     }
 
@@ -102,7 +103,7 @@ public class ScheduleController {
     public ResponseEntity<ScheduleResponse> reassignRoom(
             @Parameter(description = "연습 일정 ID", example = "1") @PathVariable Long id,
             @Valid @RequestBody AssignRoomRequest request,
-            @RequestAttribute("userId") Long userId) {
+            @AuthenticationPrincipal Long userId) {
         return ResponseEntity.ok(scheduleService.reassignRoom(id, request, userId));
     }
 
@@ -114,7 +115,7 @@ public class ScheduleController {
     @PostMapping("/assign/manual")
     public ResponseEntity<ScheduleResponse> assignRoom(
             @Valid @RequestBody ScheduleAssignRequest request,
-            @RequestAttribute("userId") Long userId) {
+            @AuthenticationPrincipal Long userId) {
         return ResponseEntity.ok(scheduleService.assignRoom(request, userId));
     }
 
@@ -125,7 +126,7 @@ public class ScheduleController {
             @Parameter(description = "대상 공연 ID", example = "1") @RequestParam Long performanceId,
             @Parameter(description = "배정할 주의 시작일", example = "2026-07-13")
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate weekStart,
-            @RequestAttribute("userId") Long userId) {
+            @AuthenticationPrincipal Long userId) {
         return ResponseEntity.ok(scheduleService.assignWeek(performanceId, weekStart, userId));
     }
 
@@ -134,7 +135,7 @@ public class ScheduleController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(
             @Parameter(description = "삭제할 연습 일정 ID", example = "1") @PathVariable Long id,
-            @RequestAttribute("userId") Long userId) {
+            @AuthenticationPrincipal Long userId) {
         scheduleService.delete(id, userId);
         return ResponseEntity.noContent().build();
     }

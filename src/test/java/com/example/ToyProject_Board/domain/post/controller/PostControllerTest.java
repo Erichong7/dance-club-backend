@@ -55,8 +55,7 @@ public class PostControllerTest extends ControllerTestSupport {
 
         mockMvc.perform(post("/api/posts")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request))
-                        .requestAttr("userId", 1L))
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.title").value("테스트 제목"))
                 .andExpect(jsonPath("$.content").value("테스트 내용"))
@@ -70,8 +69,7 @@ public class PostControllerTest extends ControllerTestSupport {
 
         mockMvc.perform(post("/api/posts")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request))
-                        .requestAttr("userId", 1L))
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value("C001"))
                 .andExpect(jsonPath("$.errors[0].field").value("title"))
@@ -85,8 +83,7 @@ public class PostControllerTest extends ControllerTestSupport {
 
         mockMvc.perform(post("/api/posts")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request))
-                        .requestAttr("userId", 1L))
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
                 .andDo(print());
     }
@@ -140,8 +137,7 @@ public class PostControllerTest extends ControllerTestSupport {
 
         mockMvc.perform(put("/api/posts/1")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request))
-                        .requestAttr("userId", 1L))
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.title").value("수정된 제목"))
                 .andExpect(jsonPath("$.content").value("수정된 내용"))
@@ -155,8 +151,7 @@ public class PostControllerTest extends ControllerTestSupport {
 
         mockMvc.perform(put("/api/posts/1")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request))
-                        .requestAttr("userId", 1L))
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
                 .andDo(print());
     }
@@ -164,8 +159,7 @@ public class PostControllerTest extends ControllerTestSupport {
     @Test
     @DisplayName("게시글 삭제 성공")
     void 게시글_삭제_성공() throws Exception {
-        mockMvc.perform(delete("/api/posts/1")
-                        .requestAttr("userId", 1L))
+        mockMvc.perform(delete("/api/posts/1"))
                 .andExpect(status().isNoContent())
                 .andDo(print());
     }
