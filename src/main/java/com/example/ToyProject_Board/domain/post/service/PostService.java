@@ -8,6 +8,8 @@ import com.example.ToyProject_Board.domain.post.dto.response.PostResponse;
 import com.example.ToyProject_Board.domain.post.repository.PostRepository;
 import com.example.ToyProject_Board.domain.user.User;
 import com.example.ToyProject_Board.domain.user.repository.UserRepository;
+import com.example.ToyProject_Board.global.exception.BusinessException;
+import com.example.ToyProject_Board.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,7 +29,7 @@ public class PostService {
     @Transactional
     public PostResponse create(PostCreateRequest request, @RequestAttribute("userId") Long userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("유저를 찾을 수 없습니다"));
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
         Post post = Post.builder()
                 .title(request.getTitle())
@@ -47,7 +49,7 @@ public class PostService {
     // 게시글 단건 조회
     public PostResponse getOne(Long postId) {
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다"));
+                .orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND));
 
         return new PostResponse(post);
     }
@@ -56,10 +58,10 @@ public class PostService {
     @Transactional
     public PostResponse update(Long postId, PostUpdateRequest request, Long userId) {
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다"));
+                .orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND));
 
         if (!post.getUser().getId().equals(userId)) {
-            throw new RuntimeException("게시글 수정 권한이 없습니다");
+            throw new BusinessException(ErrorCode.POST_UPDATE_FORBIDDEN);
         }
 
         post.update(request.getTitle(), request.getContent());
@@ -69,10 +71,10 @@ public class PostService {
     @Transactional
     public void delete(Long postId, Long userId) {
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다"));
+                .orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND));
 
         if (!post.getUser().getId().equals(userId)) {
-            throw new RuntimeException("게시글 삭제 권한이 없습니다");
+            throw new BusinessException(ErrorCode.POST_DELETE_FORBIDDEN);
         }
 
         postRepository.delete(post);

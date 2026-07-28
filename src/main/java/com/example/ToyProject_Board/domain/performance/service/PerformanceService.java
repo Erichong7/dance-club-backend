@@ -7,6 +7,8 @@ import com.example.ToyProject_Board.domain.performance.repository.PerformanceRep
 import com.example.ToyProject_Board.domain.user.User;
 import com.example.ToyProject_Board.domain.user.UserRole;
 import com.example.ToyProject_Board.domain.user.repository.UserRepository;
+import com.example.ToyProject_Board.global.exception.BusinessException;
+import com.example.ToyProject_Board.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,14 +52,14 @@ public class PerformanceService {
 
     private Performance findById(Long id) {
         return performanceRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("공연을 찾을 수 없습니다"));
+                .orElseThrow(() -> new BusinessException(ErrorCode.PERFORMANCE_NOT_FOUND));
     }
 
     private void verifyAdmin(Long userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("유저를 찾을 수 없습니다"));
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
         if (user.getRole() != UserRole.ADMIN) {
-            throw new RuntimeException("관리자 권한이 필요합니다");
+            throw new BusinessException(ErrorCode.ADMIN_ONLY);
         }
     }
 }

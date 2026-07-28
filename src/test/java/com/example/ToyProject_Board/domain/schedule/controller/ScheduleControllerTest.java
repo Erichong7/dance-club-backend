@@ -9,6 +9,8 @@ import com.example.ToyProject_Board.domain.schedule.service.ScheduleService;
 import com.example.ToyProject_Board.domain.support.ControllerTestSupport;
 import com.example.ToyProject_Board.domain.team.TeamFixture;
 import com.example.ToyProject_Board.domain.user.UserFixture;
+import com.example.ToyProject_Board.global.security.JsonAccessDeniedHandler;
+import com.example.ToyProject_Board.global.security.JsonAuthenticationEntryPoint;
 import com.example.ToyProject_Board.global.security.SecurityConfig;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +37,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(ScheduleController.class)
-@Import(SecurityConfig.class)
+@Import({SecurityConfig.class, JsonAuthenticationEntryPoint.class, JsonAccessDeniedHandler.class})
 class ScheduleControllerTest extends ControllerTestSupport {
 
     @Autowired

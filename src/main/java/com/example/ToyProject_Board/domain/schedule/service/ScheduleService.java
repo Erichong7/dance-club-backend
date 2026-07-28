@@ -19,6 +19,8 @@ import com.example.ToyProject_Board.domain.team.repository.TeamRepository;
 import com.example.ToyProject_Board.domain.user.User;
 import com.example.ToyProject_Board.domain.user.UserRole;
 import com.example.ToyProject_Board.domain.user.repository.UserRepository;
+import com.example.ToyProject_Board.global.exception.BusinessException;
+import com.example.ToyProject_Board.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -61,9 +63,9 @@ public class ScheduleService {
         Team team = findTeamById(request.getTeamId());
 
         TeamMember member = teamMemberRepository.findByTeamAndUser(team, user)
-                .orElseThrow(() -> new RuntimeException("해당 팀의 멤버가 아닙니다"));
+                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_TEAM_MEMBER));
         if (member.getRole() == TeamMemberRole.MEMBER) {
-            throw new RuntimeException("팀장 또는 부팀장만 신청할 수 있습니다");
+            throw new BusinessException(ErrorCode.SCHEDULE_CREATE_FORBIDDEN);
         }
 
         TimeRange range = toOvernightAwareRange(request.getPracticeDate(), request.getStartTime(), request.getEndTime());
@@ -99,7 +101,7 @@ public class ScheduleService {
         Team team = findTeamById(teamId);
         User user = findUserById(userId);
         teamMemberRepository.findByTeamAndUser(team, user)
-                .orElseThrow(() -> new RuntimeException("해당 팀의 멤버가 아닙니다"));
+                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_TEAM_MEMBER));
         return scheduleRequestRepository.findByTeam(team, pageable).map(ScheduleResponse::new);
     }
 
@@ -111,11 +113,11 @@ public class ScheduleService {
         boolean isSubmitter = request.getSubmittedBy().getId().equals(userId);
         boolean isAdmin = user.getRole() == UserRole.ADMIN;
         if (!isSubmitter && !isAdmin) {
-            throw new RuntimeException("취소 권한이 없습니다");
+            throw new BusinessException(ErrorCode.SCHEDULE_CANCEL_FORBIDDEN);
         }
         if (request.getStatus() == ScheduleStatus.REJECTED
                 || request.getStatus() == ScheduleStatus.CANCELLED) {
-            throw new RuntimeException("이미 종료된 신청입니다");
+            throw new BusinessException(ErrorCode.SCHEDULE_ALREADY_CLOSED);
         }
         request.cancel();
     }
@@ -125,7 +127,7 @@ public class ScheduleService {
         verifyAdmin(adminUserId);
         ScheduleRequest request = findScheduleById(scheduleId);
         if (request.getStatus() != ScheduleStatus.PENDING) {
-            throw new RuntimeException("대기 중인 신청만 거절할 수 있습니다");
+            throw new BusinessException(ErrorCode.SCHEDULE_NOT_PENDING);
         }
         request.reject(rejectRequest.getAdminNote());
         return new ScheduleResponse(request);
@@ -141,7 +143,7 @@ public class ScheduleService {
                 .filter(teamMember -> teamMember.getRole() == TeamMemberRole.LEADER)
                 .findFirst()
                 .map(TeamMember::getUser)
-                .orElseThrow(() -> new RuntimeException("팀에 리더가 존재하지 않습니다."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.TEAM_LEADER_NOT_FOUND));
 
         TimeRange range = toOvernightAwareRange(request.getPracticeDate(), request.getStartTime(), request.getEndTime());
 
@@ -163,7 +165,7 @@ public class ScheduleService {
         verifyAdmin(adminUserId);
         ScheduleRequest request = findScheduleById(scheduleId);
         if (request.getStatus() != ScheduleStatus.APPROVED) {
-            throw new RuntimeException("승인된 신청만 방을 재배정할 수 있습니다");
+            throw new BusinessException(ErrorCode.SCHEDULE_NOT_APPROVED);
         }
         request.reassignRoom(assignRequest.getRoom());
         return new ScheduleResponse(request);
@@ -243,7 +245,7 @@ public class ScheduleService {
                 .orElse(false);
 
         if (!isAdmin && !isTeamLeader) {
-            throw new RuntimeException("삭제 권한이 없습니다");
+            throw new BusinessException(ErrorCode.SCHEDULE_DELETE_FORBIDDEN);
         }
 
         scheduleRequestRepository.delete(scheduleRequest);
@@ -253,7 +255,7 @@ public class ScheduleService {
         LocalDate weekStart = practiceDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
         LocalDate deadline = weekStart.minusDays(1); // 전주 일요일
         if (LocalDate.now().isAfter(deadline)) {
-            throw new RuntimeException("제출 기한이 지났습니다 (연습일 기준 이전 주 일요일까지 신청 가능합니다)");
+            throw new BusinessException(ErrorCode.SCHEDULE_DEADLINE_PASSED);
         }
     }
 
@@ -275,7 +277,7 @@ public class ScheduleService {
     // 시작 시각과 종료 시각으로 구간을 만들되, 종료가 시작보다 앞서면(예: 23:00 → 02:00) 익일 종료로 간주
     private TimeRange toOvernightAwareRange(LocalDate date, LocalTime startTime, LocalTime endTime) {
         if (startTime.equals(endTime)) {
-            throw new RuntimeException("시작 시간과 종료 시간이 같을 수 없습니다");
+            throw new BusinessException(ErrorCode.SCHEDULE_INVALID_TIME_RANGE);
         }
         LocalDateTime start = LocalDateTime.of(date, startTime);
         LocalDateTime end = LocalDateTime.of(date, endTime);
@@ -301,28 +303,28 @@ public class ScheduleService {
 
     private ScheduleRequest findScheduleById(Long id) {
         return scheduleRequestRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("신청을 찾을 수 없습니다"));
+                .orElseThrow(() -> new BusinessException(ErrorCode.SCHEDULE_NOT_FOUND));
     }
 
     private Performance findPerformanceById(Long id) {
         return performanceRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("공연을 찾을 수 없습니다"));
+                .orElseThrow(() -> new BusinessException(ErrorCode.PERFORMANCE_NOT_FOUND));
     }
 
     private Team findTeamById(Long id) {
         return teamRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("팀을 찾을 수 없습니다"));
+                .orElseThrow(() -> new BusinessException(ErrorCode.TEAM_NOT_FOUND));
     }
 
     private User findUserById(Long id) {
         return userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("유저를 찾을 수 없습니다"));
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
     }
 
     private void verifyAdmin(Long userId) {
         User user = findUserById(userId);
         if (user.getRole() != UserRole.ADMIN) {
-            throw new RuntimeException("관리자 권한이 필요합니다");
+            throw new BusinessException(ErrorCode.ADMIN_ONLY);
         }
     }
 }

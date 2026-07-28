@@ -3,6 +3,10 @@ package com.example.ToyProject_Board.domain.user.controller;
 import com.example.ToyProject_Board.domain.support.ControllerTestSupport;
 import com.example.ToyProject_Board.domain.user.dto.response.TokenResponse;
 import com.example.ToyProject_Board.domain.user.service.AuthService;
+import com.example.ToyProject_Board.global.exception.BusinessException;
+import com.example.ToyProject_Board.global.exception.ErrorCode;
+import com.example.ToyProject_Board.global.security.JsonAccessDeniedHandler;
+import com.example.ToyProject_Board.global.security.JsonAuthenticationEntryPoint;
 import com.example.ToyProject_Board.global.security.SecurityConfig;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,7 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(AuthController.class)
-@Import(SecurityConfig.class)
+@Import({SecurityConfig.class, JsonAuthenticationEntryPoint.class, JsonAccessDeniedHandler.class})
 public class AuthControllerTest extends ControllerTestSupport {
 
     @Autowired
@@ -96,6 +100,25 @@ public class AuthControllerTest extends ControllerTestSupport {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.accessToken").value("access_token"))
                 .andExpect(jsonPath("$.refreshToken").value("refresh_token"))
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("로그인 실패 - 자격 불일치")
+    void 로그인_실패_자격_불일치() throws Exception {
+        given(authService.login(any())).willThrow(new BusinessException(ErrorCode.INVALID_CREDENTIALS));
+
+        mockMvc.perform(post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                    "email": "test@test.com",
+                                    "password": "wrong-password"
+                                }
+                                """))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.code").value("U004"))
+                .andExpect(jsonPath("$.message").value("이메일 또는 비밀번호가 틀렸습니다"))
                 .andDo(print());
     }
 

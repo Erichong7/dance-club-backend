@@ -9,6 +9,8 @@ import com.example.ToyProject_Board.domain.user.dto.request.UserSearchRequest;
 import com.example.ToyProject_Board.domain.user.dto.response.UserDetailResponse;
 import com.example.ToyProject_Board.domain.user.dto.response.UserSearchResponse;
 import com.example.ToyProject_Board.domain.user.repository.UserRepository;
+import com.example.ToyProject_Board.global.exception.BusinessException;
+import com.example.ToyProject_Board.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,7 +29,7 @@ public class UserService {
 
     public UserDetailResponse getMyInfo(Long userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("유저를 찾을 수 없습니다"));
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
         List<Team> teams = teamMemberRepository.findByUser(user).stream()
                 .map(TeamMember::getTeam)
                 .toList();
@@ -47,9 +49,9 @@ public class UserService {
 
     private void verifyAdmin(Long userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("유저를 찾을 수 없습니다"));
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
         if (user.getRole() != UserRole.ADMIN) {
-            throw new RuntimeException("관리자 권한이 필요합니다");
+            throw new BusinessException(ErrorCode.ADMIN_ONLY);
         }
     }
 }

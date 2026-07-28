@@ -6,6 +6,10 @@ import com.example.ToyProject_Board.domain.post.dto.response.PostListResponse;
 import com.example.ToyProject_Board.domain.post.dto.response.PostResponse;
 import com.example.ToyProject_Board.domain.post.service.PostService;
 import com.example.ToyProject_Board.domain.support.ControllerTestSupport;
+import com.example.ToyProject_Board.global.exception.BusinessException;
+import com.example.ToyProject_Board.global.exception.ErrorCode;
+import com.example.ToyProject_Board.global.security.JsonAccessDeniedHandler;
+import com.example.ToyProject_Board.global.security.JsonAuthenticationEntryPoint;
 import com.example.ToyProject_Board.global.security.SecurityConfig;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -30,7 +34,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(PostController.class)
-@Import(SecurityConfig.class)
+@Import({SecurityConfig.class, JsonAuthenticationEntryPoint.class, JsonAccessDeniedHandler.class})
 public class PostControllerTest extends ControllerTestSupport {
 
     @Autowired
@@ -69,6 +73,8 @@ public class PostControllerTest extends ControllerTestSupport {
                         .content(objectMapper.writeValueAsString(request))
                         .requestAttr("userId", 1L))
                 .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("C001"))
+                .andExpect(jsonPath("$.errors[0].field").value("title"))
                 .andDo(print());
     }
 
@@ -110,6 +116,18 @@ public class PostControllerTest extends ControllerTestSupport {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.title").value("테스트 제목"))
                 .andExpect(jsonPath("$.content").value("테스트 내용"))
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("게시글 단건 조회 실패 - 존재하지 않는 게시글")
+    void 게시글_단건_조회_실패_존재하지_않음() throws Exception {
+        given(postService.getOne(1L)).willThrow(new BusinessException(ErrorCode.POST_NOT_FOUND));
+
+        mockMvc.perform(get("/api/posts/1"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.code").value("P001"))
+                .andExpect(jsonPath("$.message").value("게시글을 찾을 수 없습니다"))
                 .andDo(print());
     }
 

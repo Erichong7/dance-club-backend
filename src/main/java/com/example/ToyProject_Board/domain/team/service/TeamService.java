@@ -16,6 +16,8 @@ import com.example.ToyProject_Board.domain.team.repository.TeamRepository;
 import com.example.ToyProject_Board.domain.user.User;
 import com.example.ToyProject_Board.domain.user.UserRole;
 import com.example.ToyProject_Board.domain.user.repository.UserRepository;
+import com.example.ToyProject_Board.global.exception.BusinessException;
+import com.example.ToyProject_Board.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,10 +38,10 @@ public class TeamService {
     public TeamResponse createTeam(TeamCreateRequest request, Long adminUserId) {
         verifyAdmin(adminUserId);
         if (teamRepository.existsByName(request.getName())) {
-            throw new RuntimeException("이미 존재하는 팀 이름입니다");
+            throw new BusinessException(ErrorCode.TEAM_NAME_DUPLICATE);
         }
         Performance performance = performanceRepository.findById(request.getPerformanceId())
-                .orElseThrow(() -> new RuntimeException("존재하지 않는 공연입니다."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.TEAM_PERFORMANCE_NOT_FOUND));
         Team team = Team.builder()
                 .name(request.getName())
                 .performance(performance)
@@ -66,15 +68,15 @@ public class TeamService {
         User user = findUserById(request.getUserId());
 
         if (teamMemberRepository.existsByTeamAndUser(team, user)) {
-            throw new RuntimeException("이미 팀에 속해있는 멤버입니다");
+            throw new BusinessException(ErrorCode.TEAM_MEMBER_DUPLICATE);
         }
         if (request.getRole() == TeamMemberRole.LEADER
                 && teamMemberRepository.existsByTeamAndRole(team, TeamMemberRole.LEADER)) {
-            throw new RuntimeException("이미 팀장이 존재합니다");
+            throw new BusinessException(ErrorCode.TEAM_LEADER_EXISTS);
         }
         if (request.getRole() == TeamMemberRole.DEPUTY
                 && teamMemberRepository.existsByTeamAndRole(team, TeamMemberRole.DEPUTY)) {
-            throw new RuntimeException("이미 부팀장이 존재합니다");
+            throw new BusinessException(ErrorCode.TEAM_DEPUTY_EXISTS);
         }
 
         TeamMember member = TeamMember.builder()
@@ -92,16 +94,16 @@ public class TeamService {
         User user = findUserById(userId);
 
         TeamMember member = teamMemberRepository.findByTeamAndUser(team, user)
-                .orElseThrow(() -> new RuntimeException("팀 멤버를 찾을 수 없습니다"));
+                .orElseThrow(() -> new BusinessException(ErrorCode.TEAM_MEMBER_NOT_FOUND));
 
         TeamMemberRole newRole = request.getRole();
         if (newRole == TeamMemberRole.LEADER
                 && teamMemberRepository.existsByTeamAndRole(team, TeamMemberRole.LEADER)) {
-            throw new RuntimeException("이미 팀장이 존재합니다");
+            throw new BusinessException(ErrorCode.TEAM_LEADER_EXISTS);
         }
         if (newRole == TeamMemberRole.DEPUTY
                 && teamMemberRepository.existsByTeamAndRole(team, TeamMemberRole.DEPUTY)) {
-            throw new RuntimeException("이미 부팀장이 존재합니다");
+            throw new BusinessException(ErrorCode.TEAM_DEPUTY_EXISTS);
         }
 
         member.updateRole(newRole);
@@ -112,7 +114,7 @@ public class TeamService {
     public void delete(Long teamId, Long userId) {
         verifyAdmin(userId);
         if(!teamRepository.existsById(teamId)) {
-            throw new RuntimeException("팀을 찾을 수 없습니다");
+            throw new BusinessException(ErrorCode.TEAM_NOT_FOUND);
         }
         teamRepository.deleteById(teamId);
     }
@@ -123,25 +125,25 @@ public class TeamService {
         Team team = findTeamById(teamId);
         User user = findUserById(userId);
         if (!teamMemberRepository.existsByTeamAndUser(team, user)) {
-            throw new RuntimeException("팀 멤버를 찾을 수 없습니다");
+            throw new BusinessException(ErrorCode.TEAM_MEMBER_NOT_FOUND);
         }
         teamMemberRepository.deleteByTeamAndUser(team, user);
     }
 
     private Team findTeamById(Long teamId) {
         return teamRepository.findById(teamId)
-                .orElseThrow(() -> new RuntimeException("팀을 찾을 수 없습니다"));
+                .orElseThrow(() -> new BusinessException(ErrorCode.TEAM_NOT_FOUND));
     }
 
     private User findUserById(Long userId) {
         return userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("유저를 찾을 수 없습니다"));
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
     }
 
     private void verifyAdmin(Long userId) {
         User user = findUserById(userId);
         if (user.getRole() != UserRole.ADMIN) {
-            throw new RuntimeException("관리자 권한이 필요합니다");
+            throw new BusinessException(ErrorCode.ADMIN_ONLY);
         }
     }
 }

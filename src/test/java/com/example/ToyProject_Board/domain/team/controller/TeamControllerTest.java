@@ -6,6 +6,8 @@ import com.example.ToyProject_Board.domain.team.dto.response.TeamDetailResponse;
 import com.example.ToyProject_Board.domain.team.dto.response.TeamMemberResponse;
 import com.example.ToyProject_Board.domain.team.dto.response.TeamResponse;
 import com.example.ToyProject_Board.domain.team.service.TeamService;
+import com.example.ToyProject_Board.global.security.JsonAccessDeniedHandler;
+import com.example.ToyProject_Board.global.security.JsonAuthenticationEntryPoint;
 import com.example.ToyProject_Board.global.security.SecurityConfig;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(TeamController.class)
-@Import(SecurityConfig.class)
+@Import({SecurityConfig.class, JsonAuthenticationEntryPoint.class, JsonAccessDeniedHandler.class})
 class TeamControllerTest extends ControllerTestSupport {
 
     @Autowired

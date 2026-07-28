@@ -7,6 +7,8 @@ import com.example.ToyProject_Board.domain.user.dto.request.UserSearchRequest;
 import com.example.ToyProject_Board.domain.user.dto.response.UserDetailResponse;
 import com.example.ToyProject_Board.domain.user.dto.response.UserSearchResponse;
 import com.example.ToyProject_Board.domain.user.service.UserService;
+import com.example.ToyProject_Board.global.security.JsonAccessDeniedHandler;
+import com.example.ToyProject_Board.global.security.JsonAuthenticationEntryPoint;
 import com.example.ToyProject_Board.global.security.SecurityConfig;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -33,7 +35,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(UserController.class)
-@Import(SecurityConfig.class)
+@Import({SecurityConfig.class, JsonAuthenticationEntryPoint.class, JsonAccessDeniedHandler.class})
 public class UserControllerTest extends ControllerTestSupport {
 
     @Autowired
