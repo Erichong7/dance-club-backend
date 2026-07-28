@@ -39,6 +39,7 @@ public class AuthService {
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .nickname(request.getNickname())
+                .phoneNumber(request.getPhoneNumber())
                 .signupStatus(SignupStatus.REQUESTED)
                 .build();
 

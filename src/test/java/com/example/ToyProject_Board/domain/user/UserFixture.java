@@ -10,6 +10,7 @@ public class UserFixture {
                 .email("test@test.com")
                 .password("encoded_password")
                 .nickname("테스터")
+                .phoneNumber("010-1234-5678")
                 .build();
     }
 
@@ -24,6 +25,7 @@ public class UserFixture {
                 .email("admin@test.com")
                 .password("encoded_password")
                 .nickname("관리자")
+                .phoneNumber("010-9876-5432")
                 .build();
         ReflectionTestUtils.setField(user, "role", UserRole.ADMIN);
         return user;
@@ -41,6 +43,7 @@ public class UserFixture {
                 .email(email)
                 .password("encoded_password")
                 .nickname(nickname)
+                .phoneNumber("010-1234-5678")
                 .signupStatus(signupStatus)
                 .build();
     }

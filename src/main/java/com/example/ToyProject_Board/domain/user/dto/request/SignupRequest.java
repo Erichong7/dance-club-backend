@@ -3,6 +3,7 @@ package com.example.ToyProject_Board.domain.user.dto.request;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,4 +26,9 @@ public class SignupRequest {
     @Schema(description = "사용자의 닉네임", example = "홍길동")
     @NotBlank(message = "닉네임을 입력해주세요.")
     private String nickname;
+
+    @Schema(description = "전화번호", example = "010-1234-5678")
+    @NotBlank(message = "전화번호를 입력해주세요.")
+    @Pattern(regexp = "^01[016789]-\\d{3,4}-\\d{4}$", message = "유효한 전화번호 형식이 아닙니다.")
+    private String phoneNumber;
 }

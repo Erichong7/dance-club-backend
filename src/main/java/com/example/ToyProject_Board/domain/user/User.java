@@ -29,6 +29,9 @@ public class User {
     @Column(nullable = false)
     private String nickname;
 
+    @Column(nullable = false)
+    private String phoneNumber;
+
     private String refreshToken;
 
     @Enumerated(EnumType.STRING)
@@ -43,10 +46,11 @@ public class User {
     private LocalDateTime createdAt;
 
     @Builder
-    public User(String email, String password, String nickname, SignupStatus signupStatus) {
+    public User(String email, String password, String nickname, String phoneNumber, SignupStatus signupStatus) {
         this.email = email;
         this.password = password;
         this.nickname = nickname;
+        this.phoneNumber = phoneNumber;
         this.signupStatus = signupStatus;
     }
 

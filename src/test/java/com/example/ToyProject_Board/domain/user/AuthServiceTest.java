@@ -37,11 +37,12 @@ class AuthServiceTest {
     @Mock
     private JwtUtil jwtUtil;
 
-    private SignupRequest signupRequest(String email, String password, String nickname) {
+    private SignupRequest signupRequest(String email, String password, String nickname, String phoneNumber) {
         SignupRequest request = new SignupRequest();
         ReflectionTestUtils.setField(request, "email", email);
         ReflectionTestUtils.setField(request, "password", password);
         ReflectionTestUtils.setField(request, "nickname", nickname);
+        ReflectionTestUtils.setField(request, "phoneNumber", phoneNumber);
         return request;
     }
 
@@ -56,7 +57,7 @@ class AuthServiceTest {
     @DisplayName("회원가입 성공")
     void 회원가입_성공() {
         // given
-        SignupRequest request = signupRequest("test@test.com", "password123", "테스터");
+        SignupRequest request = signupRequest("test@test.com", "password123", "테스터", "010-1234-5678");
         given(userRepository.existsByEmail("test@test.com")).willReturn(false);
         given(passwordEncoder.encode("password123")).willReturn("encoded_pw");
 
@@ -69,7 +70,7 @@ class AuthServiceTest {
     @DisplayName("회원가입 실패 - 이메일 중복")
     void 이메일_중복으로_회원가입_실패() {
         // given
-        SignupRequest request = signupRequest("test@test.com", "password123", "테스터");
+        SignupRequest request = signupRequest("test@test.com", "password123", "테스터", "010-1234-5678");
         given(userRepository.existsByEmail("test@test.com")).willReturn(true);
 
         // when & then

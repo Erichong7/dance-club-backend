@@ -45,7 +45,8 @@ public class AuthControllerTest extends ControllerTestSupport {
                                 {
                                     "email": "test@test.com",
                                     "password": "password123",
-                                    "nickname": "테스터"
+                                    "nickname": "테스터",
+                                    "phoneNumber": "010-1234-5678"
                                 }
                                 """))
                 .andExpect(status().isOk())
@@ -61,7 +62,8 @@ public class AuthControllerTest extends ControllerTestSupport {
                                 {
                                     "email": "not-an-email",
                                     "password": "password123",
-                                    "nickname": "테스터"
+                                    "nickname": "테스터",
+                                    "phoneNumber": "010-1234-5678"
                                 }
                                 """))
                 .andExpect(status().isBadRequest())
@@ -77,7 +79,25 @@ public class AuthControllerTest extends ControllerTestSupport {
                                 {
                                     "email": "test@test.com",
                                     "password": "1234567",
-                                    "nickname": "테스터"
+                                    "nickname": "테스터",
+                                    "phoneNumber": "010-1234-5678"
+                                }
+                                """))
+                .andExpect(status().isBadRequest())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("회원가입 실패 - 전화번호 형식 오류")
+    void 전화번호_형식_오류로_회원가입_실패() throws Exception {
+        mockMvc.perform(post("/api/auth/signup")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                    "email": "test@test.com",
+                                    "password": "password123",
+                                    "nickname": "테스터",
+                                    "phoneNumber": "01012345678"
                                 }
                                 """))
                 .andExpect(status().isBadRequest())
