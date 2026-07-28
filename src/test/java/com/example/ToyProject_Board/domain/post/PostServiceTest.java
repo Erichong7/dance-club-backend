@@ -7,6 +7,7 @@ import com.example.ToyProject_Board.domain.post.dto.response.PostResponse;
 import com.example.ToyProject_Board.domain.post.repository.PostRepository;
 import com.example.ToyProject_Board.domain.post.service.PostService;
 import com.example.ToyProject_Board.domain.user.User;
+import com.example.ToyProject_Board.domain.user.UserFixture;
 import com.example.ToyProject_Board.domain.user.repository.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -39,14 +40,6 @@ public class PostServiceTest {
     @Mock
     private UserRepository userRepository;
 
-    private User createUser() {
-        return User.builder()
-                .email("test@test.com")
-                .password("test1234")
-                .nickname("테스터")
-                .build();
-    }
-
     private Post createPost(User user) {
         return Post.builder()
                 .title("테스트 제목")
@@ -59,11 +52,11 @@ public class PostServiceTest {
     @DisplayName("게시글 작성 성공")
     void 게시글_작성_성공() {
         // given
-        User user = createUser();
+        User admin = UserFixture.createAdminWithId(1L);
         PostCreateRequest request = new PostCreateRequest("테스트 제목", "테스트 내용");
-        Post post = createPost(user);
+        Post post = createPost(admin);
 
-        given(userRepository.findById(1L)).willReturn(Optional.of(user));
+        given(userRepository.findById(1L)).willReturn(Optional.of(admin));
         given(postRepository.save(any(Post.class))).willReturn(post);
 
         // when
@@ -72,7 +65,7 @@ public class PostServiceTest {
         // then
         assertThat(response.getTitle()).isEqualTo("테스트 제목");
         assertThat(response.getContent()).isEqualTo("테스트 내용");
-        assertThat(response.getNickname()).isEqualTo("테스터");
+        assertThat(response.getNickname()).isEqualTo("관리자");
     }
 
     @Test
@@ -89,10 +82,24 @@ public class PostServiceTest {
     }
 
     @Test
+    @DisplayName("게시글 작성 실패 - 관리자 아님")
+    void 관리자가_아닌_사용자의_게시글_작성_실패() {
+        // given
+        User user = UserFixture.createWithId(1L);
+        PostCreateRequest request = new PostCreateRequest("테스트 제목", "테스트 내용");
+        given(userRepository.findById(1L)).willReturn(Optional.of(user));
+
+        // when & then
+        assertThatThrownBy(() -> postService.create(request, 1L))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("관리자 권한이 필요합니다");
+    }
+
+    @Test
     @DisplayName("게시글 목록 조회 성공")
     void 게시글_목록_조회_성공() {
         // given
-        User user = createUser();
+        User user = UserFixture.createWithId(1L);
         Post post1 = createPost(user);
         Post post2 = createPost(user);
         PageRequest pageable = PageRequest.of(0, 10);
@@ -112,7 +119,7 @@ public class PostServiceTest {
     @DisplayName("게시글 단건 조회 성공")
     void 게시글_단건_조회_성공() {
         // given
-        User user = createUser();
+        User user = UserFixture.createWithId(1L);
         Post post = createPost(user);
 
         given(postRepository.findById(1L)).willReturn(Optional.of(post));
@@ -142,10 +149,11 @@ public class PostServiceTest {
     @DisplayName("게시글 수정 성공")
     void 게시글_수정_성공() {
         // given
-        User user = createUser();
-        ReflectionTestUtils.setField(user, "id", 1L);
-        Post post = createPost(user);
+        User admin = UserFixture.createAdminWithId(1L);
+        User author = UserFixture.createWithId(2L);
+        Post post = createPost(author);
 
+        given(userRepository.findById(1L)).willReturn(Optional.of(admin));
         given(postRepository.findById(1L)).willReturn(Optional.of(post));
 
         // when
@@ -157,25 +165,24 @@ public class PostServiceTest {
     }
 
     @Test
-    @DisplayName("게시글 수정 실패 - 권한 없음")
-    void 권한없는_사용자의_게시글_수정_실패() {
+    @DisplayName("게시글 수정 실패 - 관리자 아님")
+    void 관리자가_아닌_사용자의_게시글_수정_실패() {
         // given
-        User user = createUser();
-        ReflectionTestUtils.setField(user, "id", 1L);
-        Post post = createPost(user);
-
-        given(postRepository.findById(1L)).willReturn(Optional.of(post));
+        User user = UserFixture.createWithId(2L);
+        given(userRepository.findById(2L)).willReturn(Optional.of(user));
 
         // when & then
         assertThatThrownBy(() -> postService.update(1L, new PostUpdateRequest("수정된 제목", "수정된 내용"), 2L))
                 .isInstanceOf(RuntimeException.class)
-                .hasMessage("게시글 수정 권한이 없습니다");
+                .hasMessage("관리자 권한이 필요합니다");
     }
 
     @Test
     @DisplayName("게시글 수정 실패 - 게시글 없음")
     void 존재하지_않는_게시글_수정_실패() {
         // given
+        User admin = UserFixture.createAdminWithId(1L);
+        given(userRepository.findById(1L)).willReturn(Optional.of(admin));
         given(postRepository.findById(1L)).willReturn(Optional.empty());
 
         // when & then
@@ -188,11 +195,12 @@ public class PostServiceTest {
     @DisplayName("게시글 삭제 성공")
     void 게시글_삭제_성공() {
         // given
-        User user = createUser();
-        ReflectionTestUtils.setField(user, "id", 1L);
-        Post post = createPost(user);
+        User admin = UserFixture.createAdminWithId(1L);
+        User author = UserFixture.createWithId(2L);
+        Post post = createPost(author);
         ReflectionTestUtils.setField(post, "id", 1L);
 
+        given(userRepository.findById(1L)).willReturn(Optional.of(admin));
         given(postRepository.findById(1L)).willReturn(Optional.of(post));
 
         // when & then
@@ -202,26 +210,24 @@ public class PostServiceTest {
     }
 
     @Test
-    @DisplayName("게시글 삭제 실패 - 권한 없음")
-    void 권한없는_사용자의_게시글_삭제_실패() {
+    @DisplayName("게시글 삭제 실패 - 관리자 아님")
+    void 관리자가_아닌_사용자의_게시글_삭제_실패() {
         // given
-        User user = createUser();
-        ReflectionTestUtils.setField(user, "id", 1L);
-        Post post = createPost(user);
-        ReflectionTestUtils.setField(post, "id", 1L);
-
-        given(postRepository.findById(1L)).willReturn(Optional.of(post));
+        User user = UserFixture.createWithId(2L);
+        given(userRepository.findById(2L)).willReturn(Optional.of(user));
 
         // when & then
         assertThatThrownBy(() -> postService.delete(1L, 2L))
                 .isInstanceOf(RuntimeException.class)
-                .hasMessage("게시글 삭제 권한이 없습니다");
+                .hasMessage("관리자 권한이 필요합니다");
     }
 
     @Test
     @DisplayName("게시글 삭제 실패 - 게시글 없음")
     void 존재하지_않는_게시글_삭제_실패() {
         // given
+        User admin = UserFixture.createAdminWithId(1L);
+        given(userRepository.findById(1L)).willReturn(Optional.of(admin));
         given(postRepository.findById(1L)).willReturn(Optional.empty());
 
         // when & then

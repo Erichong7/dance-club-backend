@@ -29,7 +29,7 @@ public class PostController {
 
     private final PostService postService;
 
-    @Operation(summary = "게시글 작성", description = "로그인한 사용자가 새 게시글을 작성합니다.")
+    @Operation(summary = "게시글 작성", description = "관리자만 새 게시글을 작성할 수 있습니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "게시글 작성 성공"),
             @ApiResponse(responseCode = "400", description = "요청값 검증 실패 (제목/내용 누락)")
@@ -60,7 +60,7 @@ public class PostController {
         return ResponseEntity.ok(postService.getOne(id));
     }
 
-    @Operation(summary = "게시글 수정", description = "작성자 본인만 게시글의 제목과 내용을 수정할 수 있습니다.")
+    @Operation(summary = "게시글 수정", description = "관리자만 게시글의 제목과 내용을 수정할 수 있습니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "게시글 수정 성공"),
             @ApiResponse(responseCode = "400", description = "요청값 검증 실패 (제목/내용 누락)")
@@ -73,7 +73,7 @@ public class PostController {
         return ResponseEntity.ok(postService.update(id, request, userId));
     }
 
-    @Operation(summary = "게시글 삭제", description = "작성자 본인만 게시글을 삭제할 수 있습니다.")
+    @Operation(summary = "게시글 삭제", description = "관리자만 게시글을 삭제할 수 있습니다.")
     @ApiResponse(responseCode = "204", description = "게시글 삭제 성공")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(

@@ -24,8 +24,6 @@ public enum ErrorCode {
 
     // POST
     POST_NOT_FOUND(HttpStatus.NOT_FOUND, "P001", "게시글을 찾을 수 없습니다"),
-    POST_UPDATE_FORBIDDEN(HttpStatus.FORBIDDEN, "P002", "게시글 수정 권한이 없습니다"),
-    POST_DELETE_FORBIDDEN(HttpStatus.FORBIDDEN, "P003", "게시글 삭제 권한이 없습니다"),
 
     // TEAM
     TEAM_NOT_FOUND(HttpStatus.NOT_FOUND, "T001", "팀을 찾을 수 없습니다"),

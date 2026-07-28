@@ -7,6 +7,7 @@ import com.example.ToyProject_Board.domain.post.dto.response.PostListResponse;
 import com.example.ToyProject_Board.domain.post.dto.response.PostResponse;
 import com.example.ToyProject_Board.domain.post.repository.PostRepository;
 import com.example.ToyProject_Board.domain.user.User;
+import com.example.ToyProject_Board.domain.user.UserRole;
 import com.example.ToyProject_Board.domain.user.repository.UserRepository;
 import com.example.ToyProject_Board.global.exception.BusinessException;
 import com.example.ToyProject_Board.global.exception.ErrorCode;
@@ -27,8 +28,8 @@ public class PostService {
     // 게시글 작성
     @Transactional
     public PostResponse create(PostCreateRequest request, Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+        User user = findUserById(userId);
+        verifyAdmin(user);
 
         Post post = Post.builder()
                 .title(request.getTitle())
@@ -56,12 +57,10 @@ public class PostService {
     // 게시글 수정
     @Transactional
     public PostResponse update(Long postId, PostUpdateRequest request, Long userId) {
+        verifyAdmin(findUserById(userId));
+
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND));
-
-        if (!post.getUser().getId().equals(userId)) {
-            throw new BusinessException(ErrorCode.POST_UPDATE_FORBIDDEN);
-        }
 
         post.update(request.getTitle(), request.getContent());
         return new PostResponse(post);
@@ -69,13 +68,22 @@ public class PostService {
 
     @Transactional
     public void delete(Long postId, Long userId) {
+        verifyAdmin(findUserById(userId));
+
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND));
 
-        if (!post.getUser().getId().equals(userId)) {
-            throw new BusinessException(ErrorCode.POST_DELETE_FORBIDDEN);
-        }
-
         postRepository.delete(post);
+    }
+
+    private User findUserById(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+    }
+
+    private void verifyAdmin(User user) {
+        if (user.getRole() != UserRole.ADMIN) {
+            throw new BusinessException(ErrorCode.ADMIN_ONLY);
+        }
     }
 }
