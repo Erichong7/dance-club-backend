@@ -31,6 +31,10 @@ public class AuthService {
     // 회원가입
     @Transactional
     public void signup(SignupRequest request) {
+        if (!request.getPassword().equals(request.getPasswordConfirm())) {
+            throw new BusinessException(ErrorCode.PASSWORD_CONFIRM_MISMATCH);
+        }
+
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new BusinessException(ErrorCode.EMAIL_DUPLICATE);
         }

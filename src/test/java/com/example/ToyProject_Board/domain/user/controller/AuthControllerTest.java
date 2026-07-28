@@ -19,6 +19,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -45,6 +46,7 @@ public class AuthControllerTest extends ControllerTestSupport {
                                 {
                                     "email": "test@test.com",
                                     "password": "password123",
+                                    "passwordConfirm": "password123",
                                     "nickname": "테스터",
                                     "phoneNumber": "010-1234-5678"
                                 }
@@ -62,6 +64,7 @@ public class AuthControllerTest extends ControllerTestSupport {
                                 {
                                     "email": "not-an-email",
                                     "password": "password123",
+                                    "passwordConfirm": "password123",
                                     "nickname": "테스터",
                                     "phoneNumber": "010-1234-5678"
                                 }
@@ -79,6 +82,7 @@ public class AuthControllerTest extends ControllerTestSupport {
                                 {
                                     "email": "test@test.com",
                                     "password": "1234567",
+                                    "passwordConfirm": "1234567",
                                     "nickname": "테스터",
                                     "phoneNumber": "010-1234-5678"
                                 }
@@ -96,11 +100,34 @@ public class AuthControllerTest extends ControllerTestSupport {
                                 {
                                     "email": "test@test.com",
                                     "password": "password123",
+                                    "passwordConfirm": "password123",
                                     "nickname": "테스터",
                                     "phoneNumber": "01012345678"
                                 }
                                 """))
                 .andExpect(status().isBadRequest())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("회원가입 실패 - 비밀번호 확인 불일치")
+    void 비밀번호_확인_불일치로_회원가입_실패() throws Exception {
+        doThrow(new BusinessException(ErrorCode.PASSWORD_CONFIRM_MISMATCH)).when(authService).signup(any());
+
+        mockMvc.perform(post("/api/auth/signup")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                    "email": "test@test.com",
+                                    "password": "password123",
+                                    "passwordConfirm": "password456",
+                                    "nickname": "테스터",
+                                    "phoneNumber": "010-1234-5678"
+                                }
+                                """))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("U009"))
+                .andExpect(jsonPath("$.message").value("비밀번호가 일치하지 않습니다"))
                 .andDo(print());
     }
 

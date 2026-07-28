@@ -23,6 +23,10 @@ public class SignupRequest {
     @Size(min = 8, message = "비밀번호는 최소 8자 이상이어야 합니다.")
     private String password;
 
+    @Schema(description = "비밀번호 확인", example = "password1234")
+    @NotBlank(message = "비밀번호 확인을 입력해주세요.")
+    private String passwordConfirm;
+
     @Schema(description = "사용자의 닉네임", example = "홍길동")
     @NotBlank(message = "닉네임을 입력해주세요.")
     private String nickname;
