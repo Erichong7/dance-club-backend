@@ -27,7 +27,7 @@ public class PostService {
 
     // 게시글 작성
     @Transactional
-    public PostResponse create(PostCreateRequest request, @RequestAttribute("userId") Long userId) {
+    public PostResponse create(PostCreateRequest request, Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
