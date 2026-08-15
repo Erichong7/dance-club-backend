@@ -21,5 +21,8 @@ public interface ScheduleRequestRepository extends JpaRepository<ScheduleRequest
     Page<ScheduleRequest> findByPerformanceAndStartAtBetween(
             Performance performance, LocalDateTime start, LocalDateTime end, Pageable pageable);
 
+    Page<ScheduleRequest> findByPerformanceAndTeamAndStartAtBetween(
+            Performance performance, Team team, LocalDateTime start, LocalDateTime end, Pageable pageable);
+
     Page<ScheduleRequest> findByTeam(Team team, Pageable pageable);
 }

@@ -56,6 +56,18 @@ public class ScheduleController {
         return ResponseEntity.ok(scheduleService.getByWeek(performanceId, weekStart, pageable));
     }
 
+    @Operation(summary = "공연/팀별 주간 연습 일정 조회", description = "특정 공연에서 특정 팀이 신청한 해당 주(weekStart 기준)의 연습 일정을 페이지 단위로 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "공연/팀별 주간 연습 일정 조회 성공")
+    @GetMapping("/team/{teamId}/week")
+    public ResponseEntity<Page<ScheduleResponse>> getByPerformanceAndTeam(
+            @Parameter(description = "팀 ID", example = "1") @PathVariable Long teamId,
+            @Parameter(description = "대상 공연 ID", example = "1") @RequestParam Long performanceId,
+            @Parameter(description = "조회할 주의 시작일 (월요일 등 기준일)", example = "2026-07-13")
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate weekStart,
+            @PageableDefault(size = 20, sort = "startAt", direction = Sort.Direction.ASC) Pageable pageable) {
+        return ResponseEntity.ok(scheduleService.getByPerformanceAndTeam(performanceId, teamId, weekStart, pageable));
+    }
+
     @Operation(summary = "연습 일정 단건 조회", description = "연습 일정 ID로 상세 정보를 조회합니다.")
     @ApiResponse(responseCode = "200", description = "연습 일정 조회 성공")
     @GetMapping("/{id}")

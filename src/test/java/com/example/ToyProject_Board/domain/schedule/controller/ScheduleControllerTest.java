@@ -92,6 +92,17 @@ class ScheduleControllerTest extends ControllerTestSupport {
     }
 
     @Test
+    void 공연_팀별_주간_일정_조회_성공() throws Exception {
+        given(scheduleService.getByPerformanceAndTeam(any(), any(), any(), any()))
+                .willReturn(new PageImpl<>(List.of()));
+
+        mockMvc.perform(get("/api/schedules/team/{teamId}/week", 10L)
+                        .param("performanceId", "5")
+                        .param("weekStart", "2024-12-02"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
     void 주간_연습실_배정_성공() throws Exception {
         given(scheduleService.assignWeek(eq(5L), any(), eq(1L)))
                 .willReturn(List.of());

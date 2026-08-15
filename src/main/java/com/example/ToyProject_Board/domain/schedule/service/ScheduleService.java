@@ -93,6 +93,17 @@ public class ScheduleService {
                 .map(ScheduleResponse::new);
     }
 
+    public Page<ScheduleResponse> getByPerformanceAndTeam(
+            Long performanceId, Long teamId, LocalDate weekStart, Pageable pageable) {
+        Performance performance = findPerformanceById(performanceId);
+        Team team = findTeamById(teamId);
+        LocalDate weekEnd = weekStart.plusDays(6);
+        return scheduleRequestRepository
+                .findByPerformanceAndTeamAndStartAtBetween(
+                        performance, team, weekStart.atStartOfDay(), LocalDateTime.of(weekEnd, LocalTime.MAX), pageable)
+                .map(ScheduleResponse::new);
+    }
+
     public ScheduleResponse getOne(Long scheduleId) {
         return new ScheduleResponse(findScheduleById(scheduleId));
     }

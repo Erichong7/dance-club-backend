@@ -36,15 +36,6 @@ public class ScheduleRequest {
     @JoinColumn(name = "submitted_by", nullable = false)
     private User submittedBy;
 
-//    @Column(nullable = false)
-//    private LocalDate practiceDate;
-//
-//    @Column(nullable = false)
-//    private LocalTime startTime;
-//
-//    @Column(nullable = false)
-//    private LocalTime endTime;
-
     @Column(nullable = false)
     private LocalDateTime startAt;
 
