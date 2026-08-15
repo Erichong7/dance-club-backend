@@ -47,6 +47,7 @@ public enum ErrorCode {
     SCHEDULE_DELETE_FORBIDDEN(HttpStatus.FORBIDDEN, "S007", "삭제 권한이 없습니다"),
     SCHEDULE_DEADLINE_PASSED(HttpStatus.BAD_REQUEST, "S008", "제출 기한이 지났습니다 (연습일 기준 이전 주 일요일까지 신청 가능합니다)"),
     SCHEDULE_INVALID_TIME_RANGE(HttpStatus.BAD_REQUEST, "S009", "시작 시간과 종료 시간이 같을 수 없습니다"),
+    SCHEDULE_TOO_FAR_IN_ADVANCE(HttpStatus.BAD_REQUEST, "S010", "다음 주 연습만 신청할 수 있습니다"),
 
     // PERFORMANCE
     PERFORMANCE_NOT_FOUND(HttpStatus.NOT_FOUND, "PF001", "공연을 찾을 수 없습니다");

@@ -150,6 +150,35 @@ class ScheduleServiceTest {
     }
 
     @Test
+    void 다음_주보다_먼_미래의_연습은_일정_생성_실패() {
+        User user = UserFixture.createWithId(1L);
+        Team team = TeamFixture.createWithId(10L);
+        Performance performance = PerformanceFixture.createWithId(5L);
+
+        TeamMember leader = TeamMember.builder()
+                .team(team).user(user).role(TeamMemberRole.LEADER).build();
+
+        given(userRepository.findById(1L)).willReturn(Optional.of(user));
+        given(performanceRepository.findById(5L)).willReturn(Optional.of(performance));
+        given(teamRepository.findById(10L)).willReturn(Optional.of(team));
+        given(teamMemberRepository.findByTeamAndUser(team, user)).willReturn(Optional.of(leader));
+
+        // 다다음 주 목요일 = 신청 대상 주(다음 주)를 벗어남
+        LocalDate tooFarDate = LocalDate.now().plusWeeks(2).with(java.time.DayOfWeek.THURSDAY);
+
+        ScheduleCreateRequest request = new ScheduleCreateRequest();
+        ReflectionTestUtils.setField(request, "performanceId", 5L);
+        ReflectionTestUtils.setField(request, "teamId", 10L);
+        ReflectionTestUtils.setField(request, "practiceDate", tooFarDate);
+        ReflectionTestUtils.setField(request, "startTime", LocalTime.of(18, 0));
+        ReflectionTestUtils.setField(request, "endTime", LocalTime.of(20, 0));
+
+        assertThatThrownBy(() -> scheduleService.create(request, 1L))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessageContaining("다음 주");
+    }
+
+    @Test
     void 종료시간이_시작시간보다_이른_새벽_연습은_익일_종료로_저장된다() {
         User user = UserFixture.createWithId(1L);
         Team team = TeamFixture.createWithId(10L);

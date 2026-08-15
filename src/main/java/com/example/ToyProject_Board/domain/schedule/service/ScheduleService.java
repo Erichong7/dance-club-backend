@@ -254,8 +254,13 @@ public class ScheduleService {
     private void validateDeadline(LocalDate practiceDate) {
         LocalDate weekStart = practiceDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
         LocalDate deadline = weekStart.minusDays(1); // 전주 일요일
-        if (LocalDate.now().isAfter(deadline)) {
+        LocalDate today = LocalDate.now();
+        if (today.isAfter(deadline)) {
             throw new BusinessException(ErrorCode.SCHEDULE_DEADLINE_PASSED);
+        }
+        LocalDate nextDeadline = today.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY));
+        if (deadline.isAfter(nextDeadline)) {
+            throw new BusinessException(ErrorCode.SCHEDULE_TOO_FAR_IN_ADVANCE);
         }
     }
 
