@@ -7,6 +7,8 @@ import com.example.ToyProject_Board.domain.user.dto.request.UserSearchRequest;
 import com.example.ToyProject_Board.domain.user.dto.response.UserDetailResponse;
 import com.example.ToyProject_Board.domain.user.dto.response.UserSearchResponse;
 import com.example.ToyProject_Board.domain.user.service.UserService;
+import com.example.ToyProject_Board.global.exception.BusinessException;
+import com.example.ToyProject_Board.global.exception.ErrorCode;
 import com.example.ToyProject_Board.global.security.JsonAccessDeniedHandler;
 import com.example.ToyProject_Board.global.security.JsonAuthenticationEntryPoint;
 import com.example.ToyProject_Board.global.security.SecurityConfig;
@@ -29,6 +31,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.doThrow;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -85,5 +89,39 @@ public class UserControllerTest extends ControllerTestSupport {
         assertThat(captor.getValue().getNickname()).isEqualTo("테스");
         assertThat(captor.getValue().getEmail()).isNull();
         assertThat(captor.getValue().getSignupStatus()).isEqualTo(SignupStatus.APPROVED);
+    }
+
+    @Test
+    @DisplayName("회원 삭제 성공")
+    void 회원_삭제_성공() throws Exception {
+        mockMvc.perform(delete("/api/users/2"))
+                .andExpect(status().isNoContent())
+                .andDo(print());
+
+        then(userService).should().deleteUser(1L, 2L);
+    }
+
+    @Test
+    @DisplayName("회원 삭제 실패 - 관리자 아님")
+    void 회원_삭제_실패_관리자_아님() throws Exception {
+        doThrow(new BusinessException(ErrorCode.ADMIN_ONLY)).when(userService).deleteUser(1L, 2L);
+
+        mockMvc.perform(delete("/api/users/2"))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value("U002"))
+                .andExpect(jsonPath("$.message").value("관리자 권한이 필요합니다"))
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("회원 삭제 실패 - 본인 계정 삭제 시도")
+    void 회원_삭제_실패_본인_삭제() throws Exception {
+        doThrow(new BusinessException(ErrorCode.SELF_DELETE_FORBIDDEN)).when(userService).deleteUser(1L, 1L);
+
+        mockMvc.perform(delete("/api/users/1"))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value("U010"))
+                .andExpect(jsonPath("$.message").value("본인 계정은 삭제할 수 없습니다"))
+                .andDo(print());
     }
 }

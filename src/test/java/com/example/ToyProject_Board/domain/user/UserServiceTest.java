@@ -1,5 +1,7 @@
 package com.example.ToyProject_Board.domain.user;
 
+import com.example.ToyProject_Board.domain.post.repository.PostRepository;
+import com.example.ToyProject_Board.domain.schedule.repository.ScheduleRequestRepository;
 import com.example.ToyProject_Board.domain.team.Team;
 import com.example.ToyProject_Board.domain.team.TeamMember;
 import com.example.ToyProject_Board.domain.team.TeamMemberRole;
@@ -28,6 +30,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
@@ -40,6 +43,12 @@ class UserServiceTest {
 
     @Mock
     private TeamMemberRepository teamMemberRepository;
+
+    @Mock
+    private PostRepository postRepository;
+
+    @Mock
+    private ScheduleRequestRepository scheduleRequestRepository;
 
     private Team teamWithId(Long id, String name) {
         Team team = Team.builder().name(name).build();
@@ -130,5 +139,65 @@ class UserServiceTest {
                 99L, new UserSearchRequest(), PageRequest.of(0, 10)))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessage("유저를 찾을 수 없습니다");
+    }
+
+    @Test
+    @DisplayName("회원 삭제 성공 - 관리자")
+    void 회원_삭제_성공() {
+        // given
+        User admin = UserFixture.createAdminWithId(1L);
+        User target = UserFixture.createWithId(2L);
+
+        given(userRepository.findById(1L)).willReturn(Optional.of(admin));
+        given(userRepository.findById(2L)).willReturn(Optional.of(target));
+
+        // when
+        userService.deleteUser(1L, 2L);
+
+        // then
+        then(teamMemberRepository).should().deleteByUser(target);
+        then(postRepository).should().deleteByUser(target);
+        then(scheduleRequestRepository).should().deleteBySubmittedBy(target);
+        then(userRepository).should().delete(target);
+    }
+
+    @Test
+    @DisplayName("회원 삭제 실패 - 관리자 아님")
+    void 관리자가_아닌_유저의_회원_삭제_실패() {
+        // given
+        User user = UserFixture.createWithId(1L);
+        given(userRepository.findById(1L)).willReturn(Optional.of(user));
+
+        // when & then
+        assertThatThrownBy(() -> userService.deleteUser(1L, 2L))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("관리자 권한이 필요합니다");
+    }
+
+    @Test
+    @DisplayName("회원 삭제 실패 - 대상 유저 없음")
+    void 존재하지_않는_유저_삭제_실패() {
+        // given
+        User admin = UserFixture.createAdminWithId(1L);
+        given(userRepository.findById(1L)).willReturn(Optional.of(admin));
+        given(userRepository.findById(99L)).willReturn(Optional.empty());
+
+        // when & then
+        assertThatThrownBy(() -> userService.deleteUser(1L, 99L))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("유저를 찾을 수 없습니다");
+    }
+
+    @Test
+    @DisplayName("회원 삭제 실패 - 본인 계정 삭제 시도")
+    void 관리자_자기_자신_삭제_실패() {
+        // given
+        User admin = UserFixture.createAdminWithId(1L);
+        given(userRepository.findById(1L)).willReturn(Optional.of(admin));
+
+        // when & then
+        assertThatThrownBy(() -> userService.deleteUser(1L, 1L))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("본인 계정은 삭제할 수 없습니다");
     }
 }

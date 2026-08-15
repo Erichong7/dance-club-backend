@@ -4,6 +4,7 @@ import com.example.ToyProject_Board.domain.performance.Performance;
 import com.example.ToyProject_Board.domain.schedule.ScheduleRequest;
 import com.example.ToyProject_Board.domain.schedule.ScheduleStatus;
 import com.example.ToyProject_Board.domain.team.Team;
+import com.example.ToyProject_Board.domain.user.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -14,6 +15,8 @@ import java.util.List;
 public interface ScheduleRequestRepository extends JpaRepository<ScheduleRequest, Long> {
 
     List<ScheduleRequest> findByTeamAndStartAtBetween(Team team, LocalDateTime start, LocalDateTime end);
+
+    void deleteBySubmittedBy(User user);
 
     List<ScheduleRequest> findByPerformanceAndStartAtBetweenAndStatusOrderByCreatedAtAsc(
             Performance performance, LocalDateTime start, LocalDateTime end, ScheduleStatus status);

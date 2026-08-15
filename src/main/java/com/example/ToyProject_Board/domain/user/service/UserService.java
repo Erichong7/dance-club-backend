@@ -1,5 +1,7 @@
 package com.example.ToyProject_Board.domain.user.service;
 
+import com.example.ToyProject_Board.domain.post.repository.PostRepository;
+import com.example.ToyProject_Board.domain.schedule.repository.ScheduleRequestRepository;
 import com.example.ToyProject_Board.domain.team.Team;
 import com.example.ToyProject_Board.domain.team.TeamMember;
 import com.example.ToyProject_Board.domain.team.repository.TeamMemberRepository;
@@ -26,6 +28,8 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final TeamMemberRepository teamMemberRepository;
+    private final PostRepository postRepository;
+    private final ScheduleRequestRepository scheduleRequestRepository;
 
     public UserDetailResponse getMyInfo(Long userId) {
         User user = userRepository.findById(userId)
@@ -45,6 +49,24 @@ public class UserService {
         verifyAdmin(userId);
         return userRepository.searchUsers(request, pageable)
                 .map(UserSearchResponse::new);
+    }
+
+    // 회원 삭제
+    @Transactional
+    public void deleteUser(Long adminId, Long targetUserId) {
+        verifyAdmin(adminId);
+
+        if (adminId.equals(targetUserId)) {
+            throw new BusinessException(ErrorCode.SELF_DELETE_FORBIDDEN);
+        }
+
+        User target = userRepository.findById(targetUserId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+
+        teamMemberRepository.deleteByUser(target);
+        postRepository.deleteByUser(target);
+        scheduleRequestRepository.deleteBySubmittedBy(target);
+        userRepository.delete(target);
     }
 
     private void verifyAdmin(Long userId) {
