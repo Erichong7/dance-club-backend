@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestControllerAdvice
@@ -15,6 +16,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<ErrorResponse> handleBusinessException(BusinessException e) {
+        log.warn("BusinessException: code={} status={} message={}",
+                e.getErrorCode().getCode(), e.getErrorCode().getStatus(), e.getMessage());
         return ResponseEntity.status(e.getErrorCode().getStatus())
                 .body(ErrorResponse.of(e.getErrorCode()));
     }
@@ -24,6 +27,9 @@ public class GlobalExceptionHandler {
         List<ErrorResponse.FieldErrorDetail> errors = e.getBindingResult().getFieldErrors().stream()
                 .map(fieldError -> new ErrorResponse.FieldErrorDetail(fieldError.getField(), fieldError.getDefaultMessage()))
                 .toList();
+        log.warn("Validation failed: {}", errors.stream()
+                .map(fieldError -> fieldError.field() + ":" + fieldError.reason())
+                .collect(Collectors.joining(", ")));
         return ResponseEntity.badRequest()
                 .body(ErrorResponse.of(ErrorCode.INVALID_INPUT_VALUE, errors));
     }

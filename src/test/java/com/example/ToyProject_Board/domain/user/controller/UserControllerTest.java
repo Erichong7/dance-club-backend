@@ -69,7 +69,7 @@ public class UserControllerTest extends ControllerTestSupport {
     @DisplayName("회원 검색 성공 - 쿼리 파라미터 바인딩 확인")
     void 회원_검색_성공() throws Exception {
         UserSearchResponse response = new UserSearchResponse(
-                2L, "target@test.com", "테스터", UserRole.USER, SignupStatus.APPROVED,
+                2L, "target@test.com", "테스터", "010-1234-5678", UserRole.USER, SignupStatus.APPROVED,
                 LocalDateTime.of(2026, 7, 1, 12, 0));
         given(userService.searchUsers(eq(1L), any(UserSearchRequest.class), any(Pageable.class)))
                 .willReturn(new PageImpl<>(List.of(response)));

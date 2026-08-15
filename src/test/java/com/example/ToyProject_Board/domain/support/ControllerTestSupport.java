@@ -1,6 +1,7 @@
 package com.example.ToyProject_Board.domain.support;
 
 import com.example.ToyProject_Board.global.jwt.JwtAuthenticationFilter;
+import com.example.ToyProject_Board.global.logging.RequestLoggingFilter;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
@@ -19,6 +20,9 @@ public class ControllerTestSupport {
     @MockitoBean
     protected JwtAuthenticationFilter jwtAuthenticationFilter;
 
+    @MockitoBean
+    protected RequestLoggingFilter requestLoggingFilter;
+
     @BeforeEach
     void bypassJwtFilter() throws Exception {
         doAnswer(invocation -> {
@@ -32,6 +36,14 @@ public class ControllerTestSupport {
             chain.doFilter(request, response);
             return null;
         }).when(jwtAuthenticationFilter).doFilter(any(), any(), any());
+
+        doAnswer(invocation -> {
+            ServletRequest request = invocation.getArgument(0);
+            ServletResponse response = invocation.getArgument(1);
+            FilterChain chain = invocation.getArgument(2);
+            chain.doFilter(request, response);
+            return null;
+        }).when(requestLoggingFilter).doFilter(any(), any(), any());
     }
 
     // 인증된 사용자로 만들고 싶을 때 호출

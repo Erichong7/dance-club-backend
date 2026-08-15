@@ -23,6 +23,9 @@ public class UserSearchResponse {
     @Schema(description = "사용자의 닉네임")
     private String nickName;
 
+    @Schema(description = "사용자의 전화번호")
+    private String phoneNumber;
+
     @Schema(description = "사용자의 역할")
     private UserRole role;
 
@@ -36,6 +39,7 @@ public class UserSearchResponse {
         this.id = user.getId();
         this.email = user.getEmail();
         this.nickName = user.getNickname();
+        this.phoneNumber = user.getPhoneNumber();
         this.role = user.getRole();
         this.signupStatus = user.getSignupStatus();
         this.createdAt = user.getCreatedAt();
