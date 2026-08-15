@@ -46,9 +46,10 @@ public class UserController {
         return ResponseEntity.ok(userService.searchUsers(userId, request, pageable));
     }
 
-    @Operation(summary = "회원 삭제", description = "관리자가 특정 회원을 삭제합니다. 관리자 권한이 필요하며, 본인 계정은 삭제할 수 없습니다. 삭제 시 해당 회원의 게시글, 연습 신청, 팀 멤버십도 함께 삭제됩니다.")
+    @Operation(summary = "회원 삭제", description = "관리자가 특정 회원을 삭제합니다. 관리자 권한이 필요하며, 본인 계정은 삭제할 수 없습니다. 삭제 시 해당 회원의 게시글, 연습 신청, 팀 멤버십도 함께 삭제됩니다. 팀장인 회원은 먼저 팀장을 위임한 뒤에만 삭제할 수 있습니다.")
     @ApiResponses({
-            @ApiResponse(responseCode = "204", description = "회원 삭제 성공")
+            @ApiResponse(responseCode = "204", description = "회원 삭제 성공"),
+            @ApiResponse(responseCode = "409", description = "삭제 대상이 팀장으로 있는 팀이 존재함")
     })
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(

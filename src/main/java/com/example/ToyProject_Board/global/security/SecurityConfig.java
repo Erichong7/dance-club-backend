@@ -34,7 +34,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.POST, "/api/auth/signup", "/api/auth/login", "/api/auth/reissue").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/posts/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/schedules", "/api/schedules/*").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/schedules", "/api/schedules/*", "/api/schedules/team/*/week").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/teams", "/api/teams/*").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/performances", "/api/performances/*").permitAll()
                         .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**").permitAll()

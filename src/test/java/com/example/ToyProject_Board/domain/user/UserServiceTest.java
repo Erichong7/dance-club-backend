@@ -200,4 +200,26 @@ class UserServiceTest {
                 .isInstanceOf(RuntimeException.class)
                 .hasMessage("본인 계정은 삭제할 수 없습니다");
     }
+
+    @Test
+    @DisplayName("회원 삭제 실패 - 대상이 팀장인 경우")
+    void 팀장인_유저_삭제_실패() {
+        // given
+        User admin = UserFixture.createAdminWithId(1L);
+        User target = UserFixture.createWithId(2L);
+        Team team = teamWithId(10L, "댄스팀");
+        TeamMember leaderMembership = TeamMember.builder().team(team).user(target).role(TeamMemberRole.LEADER).build();
+
+        given(userRepository.findById(1L)).willReturn(Optional.of(admin));
+        given(userRepository.findById(2L)).willReturn(Optional.of(target));
+        given(teamMemberRepository.findByUser(target)).willReturn(List.of(leaderMembership));
+
+        // when & then
+        assertThatThrownBy(() -> userService.deleteUser(1L, 2L))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("팀장인 회원은 삭제할 수 없습니다. 먼저 팀장을 위임해주세요");
+
+        then(teamMemberRepository).should(org.mockito.Mockito.never()).deleteByUser(target);
+        then(userRepository).should(org.mockito.Mockito.never()).delete(target);
+    }
 }

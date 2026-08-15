@@ -4,6 +4,7 @@ import com.example.ToyProject_Board.domain.post.repository.PostRepository;
 import com.example.ToyProject_Board.domain.schedule.repository.ScheduleRequestRepository;
 import com.example.ToyProject_Board.domain.team.Team;
 import com.example.ToyProject_Board.domain.team.TeamMember;
+import com.example.ToyProject_Board.domain.team.TeamMemberRole;
 import com.example.ToyProject_Board.domain.team.repository.TeamMemberRepository;
 import com.example.ToyProject_Board.domain.user.User;
 import com.example.ToyProject_Board.domain.user.UserRole;
@@ -62,6 +63,12 @@ public class UserService {
 
         User target = userRepository.findById(targetUserId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+
+        boolean isTeamLeader = teamMemberRepository.findByUser(target).stream()
+                .anyMatch(teamMember -> teamMember.getRole() == TeamMemberRole.LEADER);
+        if (isTeamLeader) {
+            throw new BusinessException(ErrorCode.TEAM_LEADER_DELETE_FORBIDDEN);
+        }
 
         teamMemberRepository.deleteByUser(target);
         postRepository.deleteByUser(target);

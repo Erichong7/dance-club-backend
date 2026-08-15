@@ -23,6 +23,7 @@ public enum ErrorCode {
     TOKEN_MISMATCH(HttpStatus.UNAUTHORIZED, "U008", "토큰이 일치하지 않습니다"),
     PASSWORD_CONFIRM_MISMATCH(HttpStatus.BAD_REQUEST, "U009", "비밀번호가 일치하지 않습니다"),
     SELF_DELETE_FORBIDDEN(HttpStatus.FORBIDDEN, "U010", "본인 계정은 삭제할 수 없습니다"),
+    TEAM_LEADER_DELETE_FORBIDDEN(HttpStatus.CONFLICT, "U011", "팀장인 회원은 삭제할 수 없습니다. 먼저 팀장을 위임해주세요"),
 
     // POST
     POST_NOT_FOUND(HttpStatus.NOT_FOUND, "P001", "게시글을 찾을 수 없습니다"),
