@@ -31,6 +31,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
@@ -49,6 +50,7 @@ public class ScheduleService {
     private static final LocalTime CHEER_ROOM_END = LocalTime.of(20, 30);
     private static final int CHEER_ROOM_MAX_TEAMS = 3;
     private static final long MAX_DAILY_MINUTES = 120;
+    private static final ZoneId KST = ZoneId.of("Asia/Seoul");
 
     private final ScheduleRequestRepository scheduleRequestRepository;
     private final PerformanceRepository performanceRepository;
@@ -265,7 +267,7 @@ public class ScheduleService {
     private void validateDeadline(LocalDate practiceDate) {
         LocalDate weekStart = practiceDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
         LocalDate deadline = weekStart.minusDays(1); // 전주 일요일
-        LocalDate today = LocalDate.now();
+        LocalDate today = LocalDate.now(KST);
         if (today.isAfter(deadline)) {
             throw new BusinessException(ErrorCode.SCHEDULE_DEADLINE_PASSED);
         }
