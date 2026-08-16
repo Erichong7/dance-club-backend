@@ -16,7 +16,7 @@ spring:
     show-sql: true
 
 jwt:
-  secret: your-secret-key-here-make-it-long-enough-256bit
-  access-expiration: 1800000    # 30분 (ms)
-  refresh-expiration: 604800000 # 7일 (ms)
+  secret: ${JWT_SECRET}
+  access-expiration: ${JWT_ACCESS_EXPIRATION:1800000}    # 30분 (ms)
+  refresh-expiration: ${JWT_REFRESH_EXPIRATION:604800000} # 7일 (ms)
 
