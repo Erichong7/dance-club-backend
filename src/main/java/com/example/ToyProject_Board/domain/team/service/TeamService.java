@@ -11,6 +11,7 @@ import com.example.ToyProject_Board.domain.team.dto.request.UpdateMemberRoleRequ
 import com.example.ToyProject_Board.domain.team.dto.response.TeamDetailResponse;
 import com.example.ToyProject_Board.domain.team.dto.response.TeamMemberResponse;
 import com.example.ToyProject_Board.domain.team.dto.response.TeamResponse;
+import com.example.ToyProject_Board.domain.schedule.repository.ScheduleRequestRepository;
 import com.example.ToyProject_Board.domain.team.repository.TeamMemberRepository;
 import com.example.ToyProject_Board.domain.team.repository.TeamRepository;
 import com.example.ToyProject_Board.domain.user.User;
@@ -32,6 +33,7 @@ public class TeamService {
     private final TeamRepository teamRepository;
     private final TeamMemberRepository teamMemberRepository;
     private final PerformanceRepository performanceRepository;
+    private final ScheduleRequestRepository scheduleRequestRepository;
     private final UserRepository userRepository;
 
     @Transactional
@@ -113,10 +115,11 @@ public class TeamService {
     @Transactional
     public void delete(Long teamId, Long userId) {
         verifyAdmin(userId);
-        if(!teamRepository.existsById(teamId)) {
-            throw new BusinessException(ErrorCode.TEAM_NOT_FOUND);
-        }
-        teamRepository.deleteById(teamId);
+        Team team = findTeamById(teamId);
+
+        scheduleRequestRepository.deleteByTeam(team);
+        teamMemberRepository.deleteByTeam(team);
+        teamRepository.delete(team);
     }
 
     @Transactional

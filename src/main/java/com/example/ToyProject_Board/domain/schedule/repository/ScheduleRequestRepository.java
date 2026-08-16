@@ -28,4 +28,8 @@ public interface ScheduleRequestRepository extends JpaRepository<ScheduleRequest
             Performance performance, Team team, LocalDateTime start, LocalDateTime end, Pageable pageable);
 
     Page<ScheduleRequest> findByTeam(Team team, Pageable pageable);
+
+    void deleteByTeam(Team team);
+
+    void deleteByPerformance(Performance performance);
 }

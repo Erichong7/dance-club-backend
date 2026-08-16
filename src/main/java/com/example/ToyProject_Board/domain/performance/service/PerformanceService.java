@@ -4,6 +4,10 @@ import com.example.ToyProject_Board.domain.performance.Performance;
 import com.example.ToyProject_Board.domain.performance.dto.request.PerformanceCreateRequest;
 import com.example.ToyProject_Board.domain.performance.dto.response.PerformanceResponse;
 import com.example.ToyProject_Board.domain.performance.repository.PerformanceRepository;
+import com.example.ToyProject_Board.domain.schedule.repository.ScheduleRequestRepository;
+import com.example.ToyProject_Board.domain.team.Team;
+import com.example.ToyProject_Board.domain.team.repository.TeamMemberRepository;
+import com.example.ToyProject_Board.domain.team.repository.TeamRepository;
 import com.example.ToyProject_Board.domain.user.User;
 import com.example.ToyProject_Board.domain.user.UserRole;
 import com.example.ToyProject_Board.domain.user.repository.UserRepository;
@@ -21,6 +25,9 @@ import java.util.List;
 public class PerformanceService {
 
     private final PerformanceRepository performanceRepository;
+    private final TeamRepository teamRepository;
+    private final TeamMemberRepository teamMemberRepository;
+    private final ScheduleRequestRepository scheduleRequestRepository;
     private final UserRepository userRepository;
 
     @Transactional
@@ -47,7 +54,15 @@ public class PerformanceService {
     @Transactional
     public void delete(Long id, Long adminUserId) {
         verifyAdmin(adminUserId);
-        performanceRepository.delete(findById(id));
+        Performance performance = findById(id);
+
+        scheduleRequestRepository.deleteByPerformance(performance);
+        List<Team> teams = teamRepository.findByPerformance(performance);
+        for (Team team : teams) {
+            teamMemberRepository.deleteByTeam(team);
+        }
+        teamRepository.deleteAll(teams);
+        performanceRepository.delete(performance);
     }
 
     private Performance findById(Long id) {

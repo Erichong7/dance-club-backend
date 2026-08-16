@@ -3,6 +3,7 @@ package com.example.ToyProject_Board.domain.team;
 import com.example.ToyProject_Board.domain.performance.Performance;
 import com.example.ToyProject_Board.domain.performance.PerformanceFixture;
 import com.example.ToyProject_Board.domain.performance.repository.PerformanceRepository;
+import com.example.ToyProject_Board.domain.schedule.repository.ScheduleRequestRepository;
 import com.example.ToyProject_Board.domain.team.dto.request.AddMemberRequest;
 import com.example.ToyProject_Board.domain.team.dto.request.TeamCreateRequest;
 import com.example.ToyProject_Board.domain.team.dto.response.TeamMemberResponse;
@@ -26,6 +27,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 @ExtendWith(MockitoExtension.class)
 class TeamServiceTest {
@@ -41,6 +45,9 @@ class TeamServiceTest {
 
     @Mock
     private PerformanceRepository performanceRepository;
+
+    @Mock
+    private ScheduleRequestRepository scheduleRequestRepository;
 
     @Mock
     private UserRepository userRepository;
@@ -158,5 +165,35 @@ class TeamServiceTest {
         assertThatThrownBy(() -> teamService.addMember(10L, request, 1L))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessageContaining("이미 팀에 속해있는");
+    }
+
+    @Test
+    void 팀_삭제시_팀원과_일정도_함께_삭제된다() {
+        User admin = UserFixture.createAdminWithId(1L);
+        Team team = TeamFixture.createWithId(10L);
+
+        given(userRepository.findById(1L)).willReturn(Optional.of(admin));
+        given(teamRepository.findById(10L)).willReturn(Optional.of(team));
+
+        teamService.delete(10L, 1L);
+
+        verify(scheduleRequestRepository).deleteByTeam(team);
+        verify(teamMemberRepository).deleteByTeam(team);
+        verify(teamRepository).delete(team);
+    }
+
+    @Test
+    void 존재하지_않는_팀_삭제_실패() {
+        User admin = UserFixture.createAdminWithId(1L);
+        given(userRepository.findById(1L)).willReturn(Optional.of(admin));
+        given(teamRepository.findById(10L)).willReturn(Optional.empty());
+
+        assertThatThrownBy(() -> teamService.delete(10L, 1L))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessageContaining("팀을 찾을 수 없습니다");
+
+        verifyNoInteractions(scheduleRequestRepository);
+        verify(teamMemberRepository, never()).deleteByTeam(any());
+        verify(teamRepository, never()).delete(any());
     }
 }
