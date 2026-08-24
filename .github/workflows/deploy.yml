@@ -46,3 +46,4 @@ jobs:
               --env-file /home/ubuntu/app.env \
               -p 8080:8080 \
               ${{ env.IMAGE_NAME }}:latest
+            docker image prune -a -f --filter "until=24h"
