@@ -77,6 +77,7 @@ public class AuthService {
     }
 
     // 토큰 재발급 (RTR 방식)
+    @Transactional
     public TokenResponse reissue(String refreshToken) {
         if (!jwtUtil.validateToken(refreshToken)) {
             throw new BusinessException(ErrorCode.INVALID_TOKEN);
@@ -98,6 +99,7 @@ public class AuthService {
     }
 
     // 로그아웃
+    @Transactional
     public void logout(Long userId) {
         User user = findUserById(userId);
         user.updateRefreshToken(null);
